@@ -1,0 +1,11 @@
+#
+#       INPUT FILE FO HO_1BODY_1DR 
+#
+&INP_X     X_MIN = -90.0, X_MAX = 90.0 /
+&INP_DIM   DIM_X = 1003, DIM_HO = 200 /
+&INP_MASS  IAD = 4, REDUCED_MASS = 0.952 /
+&INP_POT   PARAM_POT = -45.0, 3.4, 0.5, 0.0, 0.0  /
+&INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
+#
+&INP_AUX   I_gs = 0, Isave_EN = 0, Isave_WF = 1, Isave_BAS = 0, I_sumr = 4, I_toten = 4, Iprint = 2 /
+

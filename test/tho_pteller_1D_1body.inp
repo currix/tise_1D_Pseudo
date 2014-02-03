@@ -1,0 +1,10 @@
+#
+#       INPUT FILE FOR THO_1BODY_1D ------ pteller potential
+#
+&INP_X     X_MIN = -40.0, X_MAX = 40.0, ratio = 1.25 /
+&INP_DIM   DIM_X = 501, DIM_THO = 15 /
+&INP_MASS iad = 1, REDUCED_MASS = 1.0 /
+&INP_POT   PARAM_POT = -1.0, 1.0, 0.0, 0.0, 0.0 /
+&INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
+#
+&INP_AUX   I_GS = 0, I_SUMR = 1, I_toten = 0, ISAVE_EN = 0, ISAVE_WF = 0, ISAVE_BAS = 0, Iprint = 3 /

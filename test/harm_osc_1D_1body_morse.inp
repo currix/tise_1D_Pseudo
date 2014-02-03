@@ -1,0 +1,11 @@
+#
+#       INPUT FILE FOR HO_1BODY_1D ------ Morse potential
+#
+&INP_X     X_MIN = -35.0, X_MAX = 35.0 /
+&INP_DIM   DIM_X = 1501, DIM_HO = 200 /
+&INP_MASS iad = 0, REDUCED_MASS = 0.947 /
+&INP_POT   PARAM_POT = 57.25, 0.477860, 0.0, 0.0, 0.0 /
+&INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
+#
+&INP_AUX   i_GS = 0, I_SUMR = 0, I_toten = 3,  ISAVE_EN = 1, ISAVE_WF = 1, ISAVE_BAS = 0, Iprint = 2 /
+#&INP_POT   PARAM_POT = 61.25, 0.477860, 0.0, 0.0, 0.0 /

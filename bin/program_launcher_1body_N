@@ -1,0 +1,666 @@
+#!/usr/bin/perl
+#
+# Perl script to build dimension dependent energy spectra
+#
+# by Currix TM
+#
+use strict;
+use warnings;
+#
+use feature qw(switch);
+#
+use Getopt::Std;
+# Switches:
+my %options;
+getopts("p:hgdRT:C:c:G:",\%options);
+#
+# Temporary file name
+use File::Temp qw/ tempfile /;
+#
+(my $prgname) = $0 =~ m#.*/(.+$)#;
+#
+my $usemessage = <<"EOF";
+
+ Usage: $prgname [-hdg] -p program Nmin Nmax Nstep filein
+        $prgname [-hd] -G N -p program Nmin Nmax Nstep filein
+        $prgname [-hd] -G R -p program Rmin Rmax Rstep filein
+        $prgname [-hd] -G X -T Emax -c etol -p program Nmin Nmax Nstep filein Xmin Xmax Xstep
+        $prgname [-hd] [-C etol] -p program Nmin Nmax Nstep filein
+        $prgname [-hd] [[-c etol] -T Emax] -p program Nmin Nmax Nstep filein 
+        $prgname [-hd] -p program -RC etol  Nmin Nmax Nstep filein Xmin Xmax Xstep
+
+ 
+ Options:
+          h : help message
+          d : debugging output
+          p : 1-body fortran program name
+          g : prepare grace graphic file
+          G : prepare grace graphic file (stabilization plot)
+                    N as a function of N
+                    R as a function of ratio gamma/b (only THO)
+                    X as a function of x_{box} (only BOX, with -T option)
+          T : define a maximum energy threshold Emax
+          C : check negative energies convergence
+          c : only with -T or -G X option: check energy convergence (ISQW case)
+          R : only with -C option, check convergence with N and box 
+              radius (ISQW case)
+
+EOF
+####
+#### New option for the ISQW case combining -C --> Rconv and -c fixing x_b = Rconv
+##########################
+# xmgrace batch program :: 
+# 
+my $gracesetdef = <<"EOF";
+READ XYDX "inputfile"
+setvaln hidden false;setvaln type xydx
+setvaln symbol 0;setvaln symbol size 0.500000
+setvaln symbol color 4;setvaln symbol pattern 1
+setvaln symbol fill color 4;setvaln symbol fill pattern 0
+setvaln symbol linewidth 1.0;setvaln symbol linestyle 1
+setvaln line type 0;setvaln line linestyle 1
+setvaln line linewidth 1.0;setvaln line color 4
+setvaln line pattern 1;setvaln baseline type 0
+setvaln baseline off;setvaln dropline off
+setvaln errorbar on;setvaln errorbar place both
+setvaln errorbar color 4;setvaln errorbar pattern 1
+setvaln errorbar size 0.000000;setvaln errorbar linewidth 0.0
+setvaln errorbar linestyle 1;setvaln errorbar riser linewidth 1.0
+setvaln errorbar riser linestyle 1;setvaln errorbar riser clip off
+setvaln errorbar riser clip length 0.100000
+# setval comes here
+EOF
+###########
+my $graceset_stab_def = <<"EOF";
+READ XY "inputfile"
+setvaln hidden false;setvaln type xy
+setvaln symbol 2;setvaln symbol size 0.500000
+setvaln symbol color 4;setvaln symbol pattern 1
+setvaln symbol fill color 4;setvaln symbol fill pattern 0
+setvaln symbol linewidth 2.0;setvaln symbol linestyle 1
+setvaln symbol char 65;setvaln symbol char font 0;setvaln symbol skip 0
+setvaln line type 1;setvaln line linestyle 1
+setvaln line linewidth 2.0;setvaln line color 4
+setvaln line pattern 1;setvaln baseline type 0
+setvaln baseline off;setvaln dropline off
+# setval comes here
+EOF
+#######
+my $gracebatch = <<"EOF";
+# Run as :: gracebat -nosafe -param example_grace.txt
+# Axis
+#WORLD YMIN yminval;WORLD YMAX ymaxval
+#XAXIS TICK MAJOR 25
+#XAXIS TICK MINOR TICKS 4
+#YAXIS TICK MAJOR 0.05
+#YAXIS TICK MINOR TICKS 4
+# setval comes here
+# output device
+#DEVICE "PNG" OP "transparent:on";
+#HARDCOPY DEVICE "PNG"
+#HARDCOPY DEVICE ""
+# print
+WORLD XMIN xminval;WORLD XMAX xmaxval
+TITLE "One body 1D Potential"
+TITLE SIZE 1.500000
+SUBTITLE "   # Potential Parameters"
+XAXIS  LABEL "Basis Dimension"
+XAXIS  LABEL CHAR SIZE 1.500000
+YAXIS  LABEL "Energy (MeV)"
+YAXIS  LABEL CHAR SIZE 1.500000
+
+PRINT TO "outputfile"
+PRINT
+#
+SAVEALL "file.agr"
+EOF
+#
+die "\n\tPerl script to solve the 1D TISE for different basis dimensions.\n
+     by Currix TM\n\n$usemessage" if ($options{"h"});
+#
+die "$usemessage" if ($#ARGV < 3 );
+#
+die "$usemessage" if ($options{"c"} and not $options{"T"}); # die if options -c used without -T
+#
+die "$usemessage" if ($options{"c"} and $options{"C"}); # die if options -c used with -C
+#
+die "$usemessage" if ($options{"R"} and not $options{"C"}); # die if options -R used without -C
+#
+die "$usemessage" if ($options{"G"} and $options{"G"} eq "X" and (not $options{"T"} or not $options{"c"}) ); # die if option -G X used without -T or -c
+#
+my $f90_prog_name;
+if ($options{"p"}) {
+  $f90_prog_name = $options{"p"};
+} else {
+  die "No program name given (p option)\n";
+}
+#
+my $Nm = shift(@ARGV);
+my $NM = shift(@ARGV);
+my $Ns = shift(@ARGV);
+my $filein = shift(@ARGV);
+my ($xm,$xM,$xs);
+if ($options{"R"} or ($options{"G"} and $options{"G"} eq "X") ) {
+  if (@ARGV) { # Check in xvar info exists
+    $xm = shift(@ARGV);
+    $xM = shift(@ARGV);
+    $xs = shift(@ARGV);
+  } else {
+    die "$usemessage\n\n\tRmin Rmax Rstep missing\n";
+  }
+}
+#
+# Energy threshold
+my $e_threshold;
+if ($options{"T"}) {
+  $e_threshold = $options{"T"};
+}
+#
+#
+my @stab_plot_energies;
+#
+if ($options{"d"}) {
+  print "Nmin = $Nm ; NMax = $NM ; Nstep = $Ns\n";
+  print "filein = $filein\n";   # fileout = $fileout\n";
+}
+#
+open (FLIN,"<$filein") or die "Cannot open file $filein\n";
+#
+my @flin;
+my @delfiles;
+my $cnt = 0;
+my $tempgr = $gracebatch if ($options{"g"} or $options{"G"});
+while (<FLIN>) {
+  push @flin, $_;
+}
+#
+my $stab_plot_lev_num;
+my ($ratio_m, $ratio_M, $ratio_s);
+for ($options{"G"}) {
+  #
+  when ("X") {
+    print "Stabilization plot for box radius min x = $xm ,  max x = $xM ,  xstep = $xs\n" if($options{"d"});
+  }
+  #
+  when ("R") {
+    foreach (@flin) {
+      $stab_plot_lev_num = $2 if (/^(&INP_DIM\s+DIM_X = .*DIM.* = )(\d+)(.*)$/i);
+    }
+    ($ratio_m, $ratio_M, $ratio_s) = ($Nm, $NM, $Ns);
+    print "Stabilization plot for THO ratio with N = $stab_plot_lev_num\n min ratio = $ratio_m ,  max_ratio = $ratio_M ,  step_ratio = $ratio_s\n" if($options{"d"});
+  }
+  when ("N") {
+    # N case (minimum Nvalue)
+    $stab_plot_lev_num = $Nm;
+    print "Stabilization plot for N with Nmin = $stab_plot_lev_num\n"  if($options{"d"});
+  }
+  when (undef) {
+    # Do nothing
+  }
+  #
+  default {
+    die "Valid -G options: X, N, R\n" 
+  }
+}
+#
+my $done = 0; # Flag for $options{"R"}, $options{"G"} eq "R", $options{"G"} eq "X"
+#
+my $etol;
+$etol = $options{"C"} if ($options{"C"});
+$etol = $options{"c"} if ($options{"c"});
+my @old_energies = () if ($options{"C"} or $options{"c"});
+#
+#
+if ($options{"R"}) {
+  #
+  $done++;
+  #
+  my @old_R_energies = ();
+  my @avalues;
+  #
+  for (my $xval = $xm; $xval <= $xM; $xval += $xs) {
+    #
+    print "Box radius $xval fm\n" if  ($options{"d"});
+    #
+    &replace_x($xval,\@flin);   # New x value
+    #
+    my @new_R_energies = ();
+    #
+    for (my $nval = $Nm; $nval <= $NM; $nval += $Ns) {
+      #
+      print "Dimension $nval\n" if  ($options{"d"});
+      #
+      @avalues = &energies($nval,\@flin);
+      #
+      my @new_energies;
+      #
+      @new_energies = grep {$_ < 0.0} @avalues;
+      #
+      if (@old_energies) {
+        #
+        if (@old_energies == @new_energies) { # Same number of energies
+          ##
+          my $converged = 1;
+          #
+          foreach (0..$#new_energies) {
+            #
+            print "\t$nval dim |$new_energies[$_] - $old_energies[$_]| = ", abs($new_energies[$_]-$old_energies[$_]),"\n" if  ($options{"d"} && abs($new_energies[$_]-$old_energies[$_]) > $etol);
+            #
+            $converged = 0 if (abs($new_energies[$_]-$old_energies[$_]) > $etol)
+          }
+          #
+          if ($converged) {
+            print "\tConverged dim = $nval\n" if  ($options{"d"});
+            @new_R_energies = @new_energies;
+            last;
+          }
+        }
+      }
+      @old_energies = @new_energies;
+      #      print "old ener @old_energies\n" if  ($options{"d"});
+    }
+    #
+    unless (@new_R_energies) {
+      warn "No convergence found for x_b = $xval fm";
+      next;
+    }
+    if (@old_R_energies) {
+      #
+      if (@old_R_energies == @new_R_energies) { # Same number of energies
+        ##
+        my $converged = 1;
+        #
+        foreach (0..$#new_R_energies) {
+          #
+          print "$xval fm |$new_R_energies[$_] - $old_R_energies[$_]| = ", abs($new_R_energies[$_]-$old_R_energies[$_]),"\n" if  ($options{"d"} && abs($new_R_energies[$_]-$old_R_energies[$_]) > $etol);
+          #
+          $converged = 0 if (abs($new_R_energies[$_]-$old_R_energies[$_]) > $etol)
+        }
+        #
+        if ($converged) {
+          print "Converged x = $xval\n" if  ($options{"d"});
+          print "$xval @avalues\n";
+          last;
+        }
+      }
+    }
+    @old_R_energies = @new_R_energies;
+    print "old R ener @old_R_energies\n" if  ($options{"d"});
+  }
+  #
+}
+#########################################################################
+if ($options{"G"} && $options{"G"} eq "R") {
+  #
+  $done++;
+  #
+  #  Stabilization plot as a function of the THO ratio gamma/b
+  #
+  for (my $ratioval = $ratio_m; $ratioval <= $ratio_M; $ratioval += $ratio_s) {
+    #
+    print "THO ratio value = $ratioval\n" if  ($options{"d"});
+    #
+    my @avalues = &energies_THO_ratio($ratioval,\@flin);
+    #
+    shift @avalues;
+    foreach (0..$stab_plot_lev_num-1) {
+      push @{$stab_plot_energies[$_]}, $avalues[$_];
+    }
+  }
+}
+#########################################################################
+if ($options{"G"} && $options{"G"} eq "X") {
+  #
+  $done++;
+  #
+  #  Stabilization plot as a function of the box ratio x_b
+  #
+  print "Stabilization plot as a function of the box radius \n" if  ($options{"d"});
+  #
+  my @old_R_energies = ();
+  my @avalues;
+  $stab_plot_lev_num = 0;
+  #
+  for (my $xval = $xm; $xval <= $xM; $xval += $xs) {
+    #
+    print "Box radius $xval fm\n" if  ($options{"d"});
+    #
+    &replace_x($xval,\@flin);   # New x value
+    #
+    my @new_R_energies = ();
+    #
+    for (my $nval = $Nm; $nval <= $NM; $nval += $Ns) {
+      #
+      print "Dimension $nval\n" if  ($options{"d"});
+      #
+      @avalues = &energies($nval,\@flin);
+      #
+      my @new_energies;
+      #
+      @new_energies = grep {$_ < $e_threshold} @avalues;
+      #print @new_energies;
+      #
+      #
+      if (@old_energies) {
+        #
+        if (@old_energies == @new_energies) { # Same number of energies
+          ##
+          my $converged = 1;
+          #
+          foreach (0..$#new_energies) {
+            #
+            print "\t$nval dim |$new_energies[$_] - $old_energies[$_]| = ", abs($new_energies[$_]-$old_energies[$_]),"\n" if  ($options{"d"} && abs($new_energies[$_]-$old_energies[$_]) > $etol);
+            #
+            $converged = 0 if (abs($new_energies[$_]-$old_energies[$_]) > $etol)
+          }
+          #
+          if ($converged) {
+            print "\tConverged dim = $nval\n" if  ($options{"d"});
+            @new_R_energies = @new_energies;
+            last;
+          }
+        } else {
+          print "New energy level under energy threshold. Skip comparison.\n" if  ($options{"d"});
+        }
+      }
+      @old_energies = @new_energies;
+      #      print "old ener @old_energies\n" if  ($options{"d"});
+    }
+    #
+    unless (@new_R_energies) {
+      print "No convergence found for x_b = $xval fm.\n" if  ($options{"d"});
+      die "No convergence found for x_b = $xval fm";
+      next;
+    }
+    #
+    # Number of energy levels in the stabilization plot given by the minimum radius case
+    $stab_plot_lev_num = @new_R_energies unless ($stab_plot_lev_num);
+    #
+    #
+    #    shift @new_R_energies;
+    foreach (0..$stab_plot_lev_num-1) {
+      push @{$stab_plot_energies[$_]}, $new_R_energies[$_];
+    }
+    #
+  }
+  #
+}
+#########################################################################
+unless ($done) {
+  #
+  for (my $nval = $Nm; $nval <= $NM; $nval += $Ns) {
+    #
+    print "N value = $nval\n" if  ($options{"d"});
+    #
+    my @avalues = &energies($nval,\@flin);
+    #
+    unless ($options{"g"} or $options{"G"}) {
+      #
+      unless ($options{"C"} or $options{"c"}) {
+        print "@avalues\n";
+      } else {
+        my @new_energies;
+        if ($options{"C"}) {
+          @new_energies = grep {$_ < 0.0} @avalues;
+          print "new energies\n",@new_energies,"\n" if ($options{"d"});
+        } elsif ($options{"c"}) {
+####          print "$#avalues\n";
+####          print @avalues;
+          @new_energies = @avalues;
+          shift @new_energies;
+        }
+        #
+        if (@old_energies) {
+          #
+          if (@old_energies == @new_energies) { # Same number of energies
+            ##
+            my $converged = 1;
+            #
+###            print "$#new_energies\n";
+###            print @new_energies;
+            foreach (0..$#new_energies) {
+              #
+              print "|$new_energies[$_] - $old_energies[$_]| = ", abs($new_energies[$_]-$old_energies[$_]),"\n" if  ($options{"d"} && abs($new_energies[$_]-$old_energies[$_]) > $etol);
+              #
+              $converged = 0 if (abs($new_energies[$_]-$old_energies[$_]) > $etol)
+            }
+            #
+            if ($converged) {
+              print "\tConverged dim = $nval\n" if  ($options{"d"});
+              print "@avalues\n";
+              last;
+            }
+          }
+        }
+        @old_energies = @new_energies;
+        #print "old energies:\n@old_energies\n" if  ($options{"d"});
+      }
+      #
+    } elsif ($options{"g"}) {
+      # open temporary datafile for grace data
+      my ($fh, $tmpname) = tempfile("currixXXXX", DIR => "");
+      shift @avalues;
+      foreach (@avalues) {
+        print $fh "$nval $_ ".($Ns/4)."\n";
+      }
+      ;
+      #
+      push @delfiles, $tmpname;
+      #
+      (my $temp = $gracesetdef) =~ s/inputfile/$tmpname/;
+      $temp =~ s/setvaln/s$cnt/g;
+      chomp $temp;      # Avoid carriage return after substitution
+      ######################        print "$temp\n";
+      $tempgr =~s/\# setval comes here/$temp/;
+      #####################3        print "$tempgr\n";
+      #
+      $cnt++
+    } elsif ($options{"G"} eq "N") {
+      shift @avalues;
+      foreach (0..$stab_plot_lev_num-1) {
+        push @{$stab_plot_energies[$_]}, $avalues[$_];
+      }
+      #
+    } else {
+      die "You should never have arrived to this point. Sayonara baby.\n";
+    }
+    #
+  }
+}
+######################################################################
+if ($options{"g"}) {
+  # Last changes 
+  my ($xmin,$xmax) = ($Nm-$Ns/2,$NM+$Ns/2);
+  $tempgr =~s/xminval/$xmin/;
+  $tempgr =~s/xmaxval/$xmax/;
+  # open temporary datafile for grace batch file
+  my ($fh, $grfile) = tempfile("currixXXXX", DIR => "");
+  push @delfiles, $grfile;
+  #
+  print $fh $tempgr;
+  #  running grace
+  system "gracebat -nosafe -param $grfile";
+  #  deleting temporary files
+  my $delf = unlink @delfiles;
+  print "$delf temporary files deleted\n"  if($options{"d"});
+  # Add comments to the grace file
+  open (AGR,">>file.agr") or die "Cannot open file.agr.\n";
+  print AGR "# grace file created by $0 on ".scalar localtime()."\n";
+  print AGR "# Parameter file: $filein\n";
+  print AGR "# Parameter file content: \n";
+  foreach (@flin) {
+    print AGR "# $_";
+  }
+  print AGR "# by Currix TM\n";
+  close(AGR);
+}
+##################################################################
+for ($options{"G"}) {
+  #
+  when ("X") {
+    # 
+    &prepare_Grace_G($xm, $xM, $xs);
+    #
+  }
+  when ("R") {
+    # 
+    &prepare_Grace_G($ratio_m, $ratio_M, $ratio_s);
+  }
+  when ("N") {
+    # 
+    &prepare_Grace_G($Nm, $NM, $Ns);
+    #
+  }
+  when (undef) {
+    # Do nothing
+  }
+  #
+  default {
+    die "Valid -G options: X, N, R\n" 
+  }
+}
+##
+print "Sayonara Baby...\n"  if($options{"d"});
+###########################################################
+###########################################################
+###########################################################
+sub replace_x {
+  #
+  my $xval = shift;
+  my $ref = shift;
+  #
+  $xval = sprintf("%.2f", $xval);
+  #
+  foreach (@$ref) {
+    $_ = $1."-".$xval.$2.$xval.$3."\n" if (/^(.*X_min = ).*(, X_max = ).*(\s+.*\/$)/i);
+  }
+}
+###########################################################
+###########################################################
+sub energies {
+  #
+  my $nval = shift;
+  my $ref = shift;
+  #
+  #
+  my @energy;
+  #
+  # open temporary program input file
+  my ($fh, $tmpname) = tempfile("currixXXXX", DIR => "");
+  #
+  foreach (@$ref) {
+    if (/^(&INP_DIM\s+DIM_X = .*DIM.* = )(\d+)(.*)$/i) {
+      print $fh $1.$nval.$3."\n";
+    } else {
+      print $fh $_;
+    }
+  }
+  #  my @output = grep /\s+\d+(\s+|\s+-)\d+/, `../bin/wsaxon_1body_1D_HO < ./$tmpname 2> /dev/null`;
+  my @output = grep /\s+\d+(\s+|\s+-)\d+/, `$f90_prog_name < ./$tmpname  2> /dev/null`;
+  #
+  foreach (@output) {
+    push @energy, "$1" if (/\s+\d+((\s+|\s+-)\d+\..*)\s+$/);
+  }
+  #
+  @energy = grep {$_ < $e_threshold} @energy if ($options{"T"});
+  unshift @energy, $nval;
+  #
+  unlink $tmpname;
+  #
+  return @energy;
+}
+###########################################################
+sub energies_THO_ratio {
+  #
+  my $ratioval = shift;
+  my $ref = shift;
+  # Format ratio value
+  $ratioval = sprintf "%7.3f", $ratioval;
+  #
+  my @energy;
+  #
+  # open temporary program input file
+  my ($fh, $tmpname) = tempfile("currixXXXX", DIR => "");
+  #
+  foreach (@$ref) {
+    if (/^(&INP_X.*ratio =\s*)(\d+\.\d+)(.*)$/i) {
+      print $fh $1.$ratioval.$3."\n";
+      #####      print $1.$ratioval.$3."\n";
+    } else {
+      print $fh $_;
+    }
+  }
+  #
+  my @output = grep /\s+\d+(\s+|\s+-)\d+/, `$f90_prog_name < ./$tmpname  2> /dev/null`;
+  #
+  foreach (@output) {
+    push @energy, "$1" if (/\s+\d+((\s+|\s+-)\d+\..*)\s+$/);
+  }
+  #
+  @energy = grep $_ < $e_threshold, @energy if ($options{"T"});
+  unshift @energy, $ratioval;
+  #
+  unlink $tmpname;
+  #
+  return @energy;
+}
+########################################################################
+########################################################################
+sub prepare_Grace_G {
+  my ($xmin,$xmax,$xstep) = @_;
+  $tempgr =~s/xminval/$xmin/;
+  $tempgr =~s/xmaxval/$xmax/;
+  # open temporary datafile for grace batch file
+  my ($fh, $grfile) = tempfile("currixXXXX", DIR => "");
+  push @delfiles, $grfile;
+  #
+  # Write in files data for each stabilization plot line
+  # Curve counter
+  my $counter = 0;
+  # Build vector with X values 
+  my @X_vector;
+  for (my $xval = $xmin; $xval <= $xmax; $xval += $xstep) {
+    push @X_vector, $xval;
+  }
+  # temporary data filehandes and names
+  my $fhe;
+  my $enfile;
+  my @enfiles;
+  foreach (0..$stab_plot_lev_num-1) {
+    # open temporary datafile for energy data
+    ($fhe, $enfile) = tempfile("moschixXXXX", DIR => "");
+    #
+    # Save $_-th energy level data in a temporary file
+    push @delfiles, $enfile;
+    foreach my $xvalindex (0..$#X_vector) {
+      print $fhe "$X_vector[$xvalindex]  ${$stab_plot_energies[$_]}[$xvalindex]\n";
+    }
+    #
+    # Modify grace batch file
+    (my $temp = $graceset_stab_def) =~ s/inputfile/$enfile/;
+    $temp =~ s/setvaln/s$_/g;
+    chomp $temp;        # Avoid carriage return after substitution
+    ######################        print "$temp\n";
+    $tempgr =~s/\# setval comes here/$temp/;
+    #####################3        print "$tempgr\n";
+    #
+    close($fhe);
+  }
+  # write grace batch file
+  print $fh $tempgr;
+  # running grace
+  system "gracebat -nosafe -param $grfile";
+  #  deleting temporary files
+  my $delf = unlink @delfiles;
+  print "$delf temporary files deleted\n"  if($options{"d"});
+  # Add comments to the grace file
+  open (AGR,">>file.agr") or die "Cannot open file.agr.\n";
+  print AGR "# grace file created by $0 on ".scalar localtime()."\n";
+  print AGR "# Parameter file: $filein\n";
+  print AGR "# Parameter file content: \n";
+  foreach (@flin) {
+    print AGR "# $_";
+  }
+  print AGR "# by Currix TM\n";
+  close(AGR);
+}

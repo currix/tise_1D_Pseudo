@@ -1,0 +1,10 @@
+#
+#       Input FILE FOR INFSQ_1BODY_1D ------ morse potential
+#
+&INP_AUX   iGS = 0, I_SUMR = 3, I_toten = 3, ISAVEEN = 1, ISAVEWF = 1, ISAVEBAS = 0, Iprint = 3 /
+&INP_X     X_MIN = -30.0, X_MAX = 30.0 /
+&INP_DIM   DIM_X = 1501, DIM_BOX = 150 /
+&INP_MASS iad = 0, REDUCED_MASS = 0.947 /
+&INP_POT   PARAM_POT = 57.25, 0.477860, 0.0, 0.0, 0.0 /
+&INP_SHIFT IPHASE = 0, LAMBDA = 0.1 /
+#
