@@ -1,0 +1,10 @@
+#
+#       INPUT FILE FOR THO_1BODY_1D hazitaylor
+#
+&INP_X     X_MIN = -60.0, X_MAX = 60.0 ratio = 1.5 /
+&INP_DIM   DIM_X = 601, DIM_THO = 25 /
+&INP_MASS  IAD = 1, REDUCED_MASS = 1.0 /
+&INP_POT   PARAM_POT = 1.0, 0.225, 0.0, 0.0, 0.0 /
+&INP_SHIFT I_PHASE = 0, LAMBDA = 0.225 /
+#
+&INP_AUX   I_GS = 0, I_SUMR = 1, I_toten = 0, ISAVE_EN = 1, ISAVE_WF = 1, ISAVE_BAS = 0, Iprint = 3 /

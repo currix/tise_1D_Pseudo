@@ -11,7 +11,7 @@ SUBROUTINE HO_1D_BASIS(apar, NdimH, Iprint)
   !
   !     FORMAT :: Iprint  --> VERBOSITY CONTROL
   !
-  !     $Id: build_HO_bas.f90,v 1.4 2013/06/13 10:53:11 curro Exp $
+  !     $Id: build_HO_bas.f90,v 1.3 2013/05/05 09:31:27 curro Exp laura $
   !
   !     by Currix TM.
   !

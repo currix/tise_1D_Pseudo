@@ -2,7 +2,7 @@ PROGRAM THO_1BODY_1D
   !
   ! PROGRAM THAT SOLVES THE 1D TISE USING A TRUNCATED HO BASIS
   !
-  ! $Id: tho_1body_1D.f90,v 1.10 2013/06/13 12:28:37 curro Exp $
+  ! $Id: tho_1body_1D.f90,v 1.10 2013/05/22 18:04:42 laura Exp laura $
   !
   ! by Currix TM
   !
@@ -134,7 +134,7 @@ PROGRAM THO_1BODY_1D
   !
   INTERFACE Total_Strength
      !
-     SUBROUTINE Total_Strength(nstates, ndim, dim_X, X_grid, avec_X, iprint)
+     SUBROUTINE Total_Strength(ndim, dim_X, X_grid, avec_X, Aval, iprint)
        !
        USE nrtype
        USE constants
@@ -143,16 +143,17 @@ PROGRAM THO_1BODY_1D
        !
        !
        ! ARGUMENTS
-       INTEGER(KIND = I4B), INTENT(IN) :: nstates, ndim, dim_X, Iprint
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid
+       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, Iprint
+       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, Aval
        REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
        !
      END SUBROUTINE Total_Strength
+     !
   END INTERFACE Total_Strength
   !
   INTERFACE Ew_Strength
      !
-     SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, nstates)
+     SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, iprint)
        !
        USE nrtype
        USE constants
@@ -160,7 +161,7 @@ PROGRAM THO_1BODY_1D
        IMPLICIT NONE
        !
        ! ARGUMENTS
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
+       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, Iprint
        REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
        REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
        !
@@ -170,18 +171,17 @@ PROGRAM THO_1BODY_1D
   !
   INTERFACE E1
      !
-     SUBROUTINE E1(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE E1(Iprint)
        !
-       USE constants
        USE nrtype
+       USE constants
+       USE egs_tho_f
+       USE lst_param
        !
        IMPLICIT NONE
        !
        ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint
        !
      END SUBROUTINE E1
      !
@@ -189,18 +189,17 @@ PROGRAM THO_1BODY_1D
   !
   INTERFACE E2
      !
-     SUBROUTINE E2(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE E2(Iprint)
        !
-       USE constants
        USE nrtype
+       USE constants
+       USE egs_tho_f
+       USE lst_param
        !
        IMPLICIT NONE
        !
        ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint
        !
      END SUBROUTINE E2
      !
@@ -253,7 +252,7 @@ PROGRAM THO_1BODY_1D
   READ(UNIT=*,NML=INP_AUX)
   !  
   ! PROGRAM VERSION
-  IF (Iprint > 1) PRINT*, "$Id: tho_1body_1D.f90,v 1.10 2013/06/13 12:28:37 curro Exp $"
+  IF (Iprint > 1) PRINT*, "$Id: tho_1body_1D.f90,v 1.10 2013/05/22 18:04:42 laura Exp laura $"
   !
   prog = 'tho' !to set output file's names
   !
@@ -440,9 +439,6 @@ PROGRAM THO_1BODY_1D
           " a = ", apar, &
           " EGS = ", egs0
      !
-     !TEST APAR = APAR/2
-     !apar = apar/ 2.0_DP
-     !
   ENDIF
   !
   !
@@ -521,21 +517,22 @@ PROGRAM THO_1BODY_1D
   !
   !
   !
-  IF (i_SUMR /= 0) THEN
+  IF (i_SUMR == 1) THEN
      ! COMPUTE TOTAL SUM RULE STRENGTH
-     !CALL Total_Strength(i_SUMR, dim_THO, dim_X, X_grid, Avec_THO_X, Iprint)
+     CALL Total_Strength(dim_THO, dim_X, X_grid, Avec_THO_X, Aval_THO, Iprint)
      ! COMPUTE ENERGY WEIGHTED SUM RULE STRENGTH
-     CALL EW_STRENGTH(dim_THO, dim_X, X_grid, Aval_THO, Avec_THO_X, I_sumr)
+     CALL EW_STRENGTH(dim_THO, dim_X, X_grid, Aval_THO, Avec_THO_X, Iprint)
   ENDIF
   !
-  ! CALCULATING E1 and E2
-  IF(I_toten /= 0) THEN
+  !
+  IF( I_toten == 1) THEN
+     !CALCULATING E1
+     CALL E1(Iprint)
      !
-     CALL E1(dim_THO, dim_X, X_max, X_grid, Aval_THO, Avec_THO_X, I_toten)
-     !
-     CALL E2(dim_THO, dim_X, X_max, X_grid, Aval_THO, Avec_THO_X, I_toten)
-     !
+     !CALCULATING E2
+     CALL E2(Iprint)
   ENDIF
+  !
   !
   ! PHASE SHIFT
   IF (I_phase == 1) THEN
@@ -703,7 +700,7 @@ PROGRAM THO_1BODY_1D
   !
   !
 10 FORMAT (1X,I6,1X,E16.8)
-11 FORMAT (1X,E14.6,1X,300E17.8E3)
+11 FORMAT (1X,E14.6,1X,300E16.8)
   !
   !
   DEALLOCATE(THO_Bas, STAT = Ierr)    

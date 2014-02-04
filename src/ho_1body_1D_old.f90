@@ -2,9 +2,7 @@ PROGRAM HO_1BODY_1D
   !
   ! PROGRAM THAT SOLVES THE 1D TISE USING A TRUNCATED HO BASIS
   !
-  ! $Id: ho_1body_1D.f90,v 1.20 2013/06/13 12:29:48 curro Exp $
-  !
-  ! Algorithm to evaluate the proper oscillator length --> look at the symbols **
+  ! $Id: ho_1body_1D.f90,v 1.16 2013/05/14 17:55:48 laura Exp laura $
   !
   ! by Currix TM
   !
@@ -17,7 +15,7 @@ PROGRAM HO_1BODY_1D
   !
   !
   ! FLAGS FOR SAVING BASIS AND EIGENVECTORS
-  INTEGER(KIND = I4B) :: isave_EN, isave_BAS, isave_WF, i_GS, isave_BAS_POT
+  INTEGER(KIND = I4B) :: isave_EN, isave_BAS, isave_WF, i_GS
   ! FLAG TO DISPLAY SUM RULES, E1 and E2
   INTEGER(KIND = I4B) ::  i_SUMR, I_toten
   !    
@@ -26,10 +24,9 @@ PROGRAM HO_1BODY_1D
   !
   ! AUXILIARY VARIABLES
   INTEGER(KIND = I4B) :: Ierr, I, J, kx, Ifail, dim_HO_temp, nev
-  REAL(KIND = DP) :: tol, fmult, k0, k1, k10, kmin, error, Total_Str_WS, Total_Str_HO
+  REAL(KIND = DP) :: tol, fmult, k0, k1, k10, kmin
   REAL(KIND = DP) :: apar, egs0, ee, ek, eta1, eta2
   REAL(KIND = DP) :: eta
-  REAL(KIND = DP), DIMENSION(:), ALLOCATABLE :: x2_vec
   !
   CHARACTER(LEN=65) :: filename
   CHARACTER(LEN=65) :: file
@@ -125,7 +122,7 @@ PROGRAM HO_1BODY_1D
   !
   INTERFACE Total_Strength
      !
-     SUBROUTINE Total_Strength(nstates, ndim, dim_X, X_grid, avec_X, iprint)
+     SUBROUTINE Total_Strength(ndim, dim_X, X_grid, avec_X, Aval, iprint)
        !
        USE nrtype
        USE constants
@@ -134,8 +131,8 @@ PROGRAM HO_1BODY_1D
        !
        !
        ! ARGUMENTS
-       INTEGER(KIND = I4B), INTENT(IN) :: nstates, ndim, dim_X, Iprint
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid
+       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, Iprint
+       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, Aval
        REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
        !
      END SUBROUTINE Total_Strength
@@ -144,7 +141,7 @@ PROGRAM HO_1BODY_1D
   !
   INTERFACE Ew_Strength
      !
-     SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, nstates)
+     SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, iprint)
        !
        USE nrtype
        USE constants
@@ -152,7 +149,7 @@ PROGRAM HO_1BODY_1D
        IMPLICIT NONE
        !
        ! ARGUMENTS
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
+       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, Iprint
        REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
        REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
        !
@@ -214,18 +211,17 @@ PROGRAM HO_1BODY_1D
   !
   INTERFACE E1
      !
-     SUBROUTINE E1(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE E1(Iprint, apar)
        !
-       USE constants
        USE nrtype
+       USE constants
+       USE egs_ho_f
        !
        IMPLICIT NONE
        !
        ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint
+       REAL(KIND = DP), INTENT(IN) :: apar
        !
      END SUBROUTINE E1
      !
@@ -233,18 +229,17 @@ PROGRAM HO_1BODY_1D
   !
   INTERFACE E2
      !
-     SUBROUTINE E2(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE E2(Iprint, apar)
        !
-       USE constants
        USE nrtype
+       USE constants
+       USE egs_ho_f
        !
        IMPLICIT NONE
        !
        ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint
+       REAL(KIND = DP), INTENT(IN) :: apar
        !
      END SUBROUTINE E2
      !
@@ -258,10 +253,10 @@ PROGRAM HO_1BODY_1D
   NAMELIST/INP_MASS/  iad, reduced_mass
   NAMELIST/INP_POT/   Param_pot
   NAMELIST/INP_SHIFT/ I_phase, lambda
-  NAMELIST/INP_AUX/   i_GS, i_SUMR, I_toten, isave_EN, isave_WF, isave_BAS, Iprint, isave_BAS_POT
+  NAMELIST/INP_AUX/   i_GS, i_SUMR, I_toten, isave_EN, isave_WF, isave_BAS, Iprint
   !
   ! PROGRAM VERSION
-  IF (Iprint > 1) PRINT*, "$Id: ho_1body_1D.f90,v 1.20 2013/06/13 12:29:48 curro Exp $"
+  IF (Iprint > 1) PRINT*, "$Id: ho_1body_1D.f90,v 1.16 2013/05/14 17:55:48 laura Exp laura $"
   !
   prog = 'ho' !to set output file's names
   !
@@ -311,11 +306,11 @@ PROGRAM HO_1BODY_1D
      !
      kmin = 1.0_DP
      !
-     !  ELSE IF (IAD == 3) THEN 
-     !     PRINT*, "ENTER KMIN"
-     !     READ*, kmin
+!  ELSE IF (IAD == 3) THEN 
+!     PRINT*, "ENTER KMIN"
+!     READ*, kmin
   ELSE
-     ! **1 ground state energy minimization to obtain apar
+     !
      ! Compute optimum apar value
      dim_HO_temp = dim_HO
      dim_HO = 1
@@ -410,11 +405,6 @@ PROGRAM HO_1BODY_1D
   !    INVERSE OSCILLATOR LENGTH a = (\nu K/\hbar^2)^(1/4)  (fm^{-1})
   apar = SQRT(SQRT(kmin/h_sq_over_m)) 
   !
-  ! TEST SMALLER APAR
-  !apar = apar/3.0_DP
-  !
-  ! **2 HO basis construction
-  !
   IF (Iprint > 2) PRINT*,  "HARMONIC BASIS CALCULATION apar = ", apar, " DIMENSION ", dim_HO     
   !
   !  Add one for the calculation of derivatives in the wfp subroutine
@@ -424,7 +414,7 @@ PROGRAM HO_1BODY_1D
      STOP
   ENDIF
   !
-  CALL HO_1D_BASIS(apar, dim_HO + 1, 0)
+  CALL HO_1D_BASIS(apar, dim_HO + 1, Iprint)
   !
   ALLOCATE(Aval_Har(1:dim_HO), STAT = Ierr)    
   IF (Ierr /= 0) THEN
@@ -450,68 +440,9 @@ PROGRAM HO_1BODY_1D
      STOP
   ENDIF
   !
-  ! **3 Woods-Saxons (or other pot) wave functions calculations
-  !
   !     HAMILTONIAN DIAGONALIZATION
-  CALL HARDIAG(apar, 0, 1)
-  !
-  ! **4 <x^2>_j=3 with WS waves calculation
-  !
-  ALLOCATE(x2_vec(1:dim_X), STAT = Ierr)
-  IF (Ierr /= 0) THEN
-     PRINT*, "x2_vec allocation request denied."
-     STOP
-  ENDIF
-  !
-  !
-  x2_vec = (Avec_Har_X(:,3)*X_grid(:))**2
-  !
-  !
-  Ifail = 0
-  Total_Str_WS = 0.0_DP
-  !
-  CALL D01GAF(X_Grid, x2_vec, dim_X, Total_Str_WS, error, Ifail)
-  !
-  DEALLOCATE(x2_vec, STAT = Ierr)
-  IF (Ierr /= 0) THEN
-     PRINT*, "x2_vec deallocation request denied."
-     STOP
-  ENDIF
-  !
-  ! **5 <x^2>_j=3 with basis calculation 
-  !
-  Total_Str_HO = 7.0_DP/(2.0_DP*apar**2)
-  !
-  ! **6 comparison between **4 and **5 and setting of the new apar
-  !
-  IF ( ABS(Total_Str_HO - Total_Str_WS) > 0.001) THEN
-     apar = SQRT( 7.0_DP/(2.0_DP*Total_Str_WS) )
-  ENDIF
-  !
-  ! OSCILLATOR POTENTIAL
-  IF (isave_BAS_POT == 1) THEN
-     file = 'bas_pot'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     IF ( dim_HO < 10) THEN !to avoid spaces
-        WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
-     IF ( dim_HO > 99) THEN 
-        WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
-     OPEN(UNIT = 71, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(71,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm", "a = ", apar
-     WRITE(71,*) "#Grid     Potential"
-     DO kx = 1, dim_X
-        WRITE(71,11) X_grid(kx), 0.5_DP*h_sq_over_m*X_grid(kx)*X_grid(kx)*(apar**4) -50.0_DP
-     ENDDO
-     CLOSE(UNIT = 71)
-     !print*, "param pot 1 = ", param_pot(1)
-  ENDIF
-  !
-  ! **7 final HO basis and diagonalization
-  !
-  CALL HO_1D_BASIS(apar, dim_HO + 1, Iprint)
   CALL HARDIAG(apar, Iprint, 1)
+  !
   !
   !     COMPUTING EIGENVECTOR DERIVATIVES
   !     EIGENSTATE DERIVATIVE
@@ -603,9 +534,6 @@ PROGRAM HO_1BODY_1D
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
-     IF ( dim_HO > 99) THEN 
-        WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
      OPEN(UNIT = 73, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(73,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
      WRITE(73,*) "# Eigenvalues"
@@ -644,26 +572,24 @@ PROGRAM HO_1BODY_1D
      CLOSE(UNIT = 74)
      CLOSE(UNIT = 75)
   ENDIF
-  !w
+  !
 10 FORMAT (1X,I6,1X,E16.8)
-11 FORMAT (1X,E14.6,1X,300E17.8E3)
+11 FORMAT (1X,E14.6,1X,300E16.8)
   !
   !
-  IF (I_SUMR /= 0) THEN
+  IF (i_SUMR == 1) THEN
      ! COMPUTE TOTAL SUM RULE STRENGTH
-     !CALL Total_Strength(i_SUMR, dim_HO, dim_X, X_grid, Avec_Har_X, Iprint)
+     CALL Total_Strength(dim_HO, dim_X, X_grid, Avec_Har_X, Aval_Har, Iprint)
      ! COMPUTE ENERGY WEIGHTED SUM RULE STRENGTH
-     CALL EW_STRENGTH(dim_HO, dim_X, X_grid, Aval_Har, Avec_Har_X, I_sumr)
+     CALL EW_STRENGTH(dim_HO, dim_X, X_grid, Aval_Har, Avec_Har_X, iprint)
   ENDIF
   !
-  !
-  ! CALCULATING E1 and E2
-  IF(I_toten /= 0) THEN
+  IF(I_toten == 1) THEN
+     !CALCULATING E1
+     CALL E1(Iprint, apar)
      !
-     CALL E1(dim_HO, dim_X, X_max, X_grid, Aval_Har, Avec_Har_X, I_toten)
-     !
-     CALL E2(dim_HO, dim_X, X_max, X_grid, Aval_Har, Avec_Har_X, I_toten)
-     !
+     !CALCULATING E2
+     CALL E2(Iprint, apar)
   ENDIF
   !
   ! PHASE SHIFT CALCULATION
@@ -693,7 +619,6 @@ PROGRAM HO_1BODY_1D
      WRITE(77,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
      WRITE(77,*) "#2ek/Pi      Phase shift (Chadan calculation)"
      !
-     print*, "eta1 and eta2 are the phase shift tangent"
      DO I = 1, dim_HO
         IF (Aval_Har(I) > 0.0_DP) THEN
            ee = Aval_Har(I)
@@ -701,19 +626,18 @@ PROGRAM HO_1BODY_1D
            !     Hazi and Taylor formula
            CALL PHASE_SHIFT_HT(dim_X, X_grid, Avec_Har_X, lambda, I, ee, ek, eta1, eta2)
            !     
-           IF (Iprint > 1) WRITE(*,*)  ee,  eta1
-           !IF (Iprint > 1) WRITE(*,*) I,"-TH STATE E = ", ee, &
-           !     "   K = ", ek, " :: eta1 = ", eta1, ", eta2 = ", eta2
+           IF (Iprint > 1) WRITE(*,*) I,"-TH STATE E = ", ee, &
+                "   K = ", ek, " :: eta1 = ", eta1, ", eta2 = ", eta2
            !
-           !WRITE(76,*) ek*2.0_DP/PI_D, eta2
+           WRITE(76,*) ek*2.0_DP/PI_D, eta2
            !
            ! Chadan et al. formula
            CALL PHASE_SHIFT_CH(I,ek,eta)
            !
-           !IF (Iprint > 1) WRITE(*,*) I,"-TH STATE E = ", ee, &
-           !     "   K = ", ek, " :: eta = ", eta
+           IF (Iprint > 1) WRITE(*,*) I,"-TH STATE E = ", ee, &
+                "   K = ", ek, " :: eta = ", eta
            !
-           !WRITE(77,*) ek*2.0_DP/PI_D, eta
+           WRITE(77,*) ek*2.0_DP/PI_D, eta
            !     
         ENDIF
      ENDDO

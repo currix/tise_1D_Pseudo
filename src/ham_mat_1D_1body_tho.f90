@@ -6,7 +6,7 @@ SUBROUTINE THARDIAG(apt, Iprint, Iflag)
   !
   !     FORMAT :: IPRINT  --> VERBOSITY CONTROL
   !
-  !  $Id: ham_mat_1D_1body_tho.f90,v 1.3 2013/06/13 11:27:59 curro Exp $
+  !  $Id: ham_mat_1D_1body_tho.f90,v 1.2 2013/05/22 18:03:25 laura Exp laura $
   !
   !     by Currix TM.
   !

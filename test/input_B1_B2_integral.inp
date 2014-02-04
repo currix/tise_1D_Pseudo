@@ -1,0 +1,6 @@
+#
+#       INPUT FILE FOR E1_int_energy
+#
+&INP_nrg   E_b = 1.906, E_max = 8, NdE = 300 /
+&INP_mass  red_mass = 0.952 /
+#

@@ -11,7 +11,7 @@ SUBROUTINE THO_1D_BASIS(apar, NdimH, Iprint)
   !
   !     FORMAT :: Iprint  --> VERBOSITY CONTROL
   !
-  !     $Id: build_THO_bas.f90,v 1.3 2013/06/13 10:57:54 curro Exp $
+  !     $Id: build_THO_bas.f90,v 1.2 2013/05/22 17:56:57 laura Exp laura $
   !
   !     by Currix TM.
   !
