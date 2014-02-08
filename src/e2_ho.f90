@@ -2,7 +2,7 @@ SUBROUTINE E2_HO(Iprint, I_toten, apar)
   !
   ! <GS|X^2|AVEC(i)>
   !
-  ! $Id: e2_ho.f90,v 1.8 2014/01/30 19:02:40 curro Exp $
+  ! Last rcs version befor git $Id: e2_ho.f90,v 1.8 2014/01/30 19:02:40 curro Exp $
   !
   USE constants
   USE nrtype
@@ -105,7 +105,7 @@ SUBROUTINE E2_HO(Iprint, I_toten, apar)
      WRITE(78,*) "#Aval_har(i)    E2_analytical**2"
      !
      DO i = 1, dim_HO
-        E2_analytical(i, i_state) =  DOT_PRODUCT(Avec_Har(:,1), MATMUL(matrix_x2,Avec_Har(:,i)))
+        E2_analytical(i, i_state) =  DOT_PRODUCT(Avec_Har(:, i_state), MATMUL(matrix_x2,Avec_Har(:,i)))
         WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <GS | X^2 |Avec(",i,")> = ", E2_analytical(i, i_state)
         !
         ! SAVING E2
