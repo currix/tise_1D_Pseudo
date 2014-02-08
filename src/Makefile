@@ -153,9 +153,10 @@ FC = gfortran
 FOPT	= -c 
 FOPT   += -Wall
 MODLIB   = -I/usr/local/lib/lapack95/lapack95_modules
+MODLIB   += -I/usr/local/include/lapack95_modules
 FOPT   += $(MODLIB)
 #
-LAPACK95_PATH = /usr/local/lib/lapack95
+LAPACK95_PATH =	 /usr/local/lib
 LAPACK95 = $(LAPACK95_PATH)/lapack95.a
 # Cluster
 LAPACK77 = -llapack
