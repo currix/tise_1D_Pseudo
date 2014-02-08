@@ -79,7 +79,7 @@ SUBROUTINE E1_ISQW(Iprint, I_toten)
         !
         CALL D01GAF(X_Grid, matrix_element, dim_X, E1_numerical, error, Ifail)
         !
-     WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <GS | X |Avec(",i,")> = ", E1_numerical
+     WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <",i_state,"| X |Avec(",i,")> = ", E1_numerical
      ENDDO
      !
      !
@@ -103,7 +103,7 @@ SUBROUTINE E1_ISQW(Iprint, I_toten)
      DO i = 1, DIM_BOX
         E1_analytical(i, i_state) = DOT_PRODUCT(Avec_box(:,i_state),MATMUL(matrix_x,Avec_box(:,i)))
         !
-        WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <bnd | X |Avec(",i,")> = ", E1_analytical(i, i_state)
+        WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <",i_state,"| X |Avec(",i,")> = ", E1_analytical(i, i_state)
         ! SAVING E1
         WRITE(78,11)  Aval_box(i), E1_analytical(i, i_state)**2
         !
@@ -140,7 +140,7 @@ SUBROUTINE E1_ISQW(Iprint, I_toten)
   !
 11 FORMAT (1X,E16.8,1X,E17.8)
 12 FORMAT (1X,E16.8,1X,10E17.8) !!!! Take care of the number of bound states I_toten
-15 FORMAT (2X,I3,A,E16.8,2X,A,I2,A,E17.8)
+15 FORMAT (2X,I3,A,E16.8,2X,A,I3,A,I3,A,E17.8)
   !
   DEALLOCATE(matrix_x, STAT = Ierr)
   IF (Ierr /= 0) THEN
