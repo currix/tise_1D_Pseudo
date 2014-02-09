@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+#
+# Perl script to compute dB/dE from the pseudostate B(EX) output
+#
+#
+# by Currix TM
+#
+use strict;
+use warnings;
+#
+use Getopt::Std;
+# Switches:
+my %options;
+getopts("s:Dh",\%options);
+#
+#
+(my $prgname) = $0 =~ m#.*/(.+$)#;
+#
+my $usemessage = <<"EOF";
+
+ Usage: $0 [-vh] [-s step] data_EX_filename 
+
+ Options:
+          s : divide by every s levels energy interval [default s = 1]
+          h : help message
+          v : verbose output
+
+
+EOF
+#
+die "\tPerl script to compute dB/dE from the Ex (x=1,2) Fortran Output\n
+\t dB/de = B/Delta_n ... Delta_n = (E_n+1(Gamma) - E_n-1(Gamma)) / 2 ... Gamma = A,B\n
+     by Currix TM\n\n$usemessage" if ($options{"h"});
+#
+my $step = 1;
+$step = $options{"s"} if ($options{"s"});
+#
+my $E_data_filename;
+if ($#ARGV < 0 ) {
+  die "$usemessage";
+} else {
+  #
+  $E_data_filename = shift @ARGV;
+}
+#
+open FILE_EX, "<$E_data_filename" or die "Cannot open file $E_data_filename.\n";
+#
+# Read energies and B values
+my (@energies, @Bvals);
+while (<FILE_EX>) {
+  next if /^\s*#.*$/;
+  my ($en, $Bx) = split;
+  next if ($en < 0);
+  print " $en  $Bx\n" if ($options{"v"});
+  push @energies, $en;
+  push @Bvals, $Bx;
+}
+#
+# Compute dBde
+my @result_dbde = map {$Bvals[$_]/(($energies[$_ + $step]-$energies[$_ - $step])/2)} $step..$#energies-$step;
+#
+foreach($step..$#energies-$step) {
+  print "$energies[$_] $result_dbde[$_ - $step]\n";
+}
+
