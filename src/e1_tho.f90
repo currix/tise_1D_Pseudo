@@ -109,7 +109,7 @@ SUBROUTINE E1_THO(Iprint, I_toten)
      !
      DO i = 1, dim_THO
         E1_num2 = DOT_PRODUCT(Avec_THO(:,i_state),MATMUL(matrix_X_THO_BASIS, Avec_THO(:,i)))
-        IF (Iprint > 1) WRITE(15,*), i, "-th state energy: ", Aval_THO(i), " <",I_state," | X |Avec(",i,")> = ", E1_num2
+        IF (Iprint > 1) WRITE(*,15), i, "-th state energy: ", Aval_THO(i), " <",I_state," | X |Avec(",i,")> = ", E1_num2
         !
         E1_numerical(i, i_state) =  E1_num2
         !

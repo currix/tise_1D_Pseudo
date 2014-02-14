@@ -88,7 +88,7 @@ SUBROUTINE E2_THO(Iprint, I_toten)
         !
         CALL D01GAF(X_Grid, matrix_element, dim_X, E2_num1, error, Ifail)
         !
-        IF (Iprint > 1) WRITE(*,15), i, "-th state energy: ", Aval_THO(i), " <state | X^2 |Avec(",i,")> = ", E2_num1
+        IF (Iprint > 1) WRITE(*,15), i, "-th state energy: ", Aval_THO(i), " <",i_state," | X^2 |Avec(",i,")> = ", E2_num1
      ENDDO
      !
      !
@@ -108,7 +108,7 @@ SUBROUTINE E2_THO(Iprint, I_toten)
      !
      DO i = 1, dim_THO
         E2_num2 = DOT_PRODUCT(Avec_THO(:,i_state),MATMUL(matrix_X_THO_BASIS, Avec_THO(:,i)))
-        IF (Iprint > 1) WRITE(15,*), i, "-th state energy: ", Aval_THO(i), " <",I_state," | X^2 |Avec(",i,")> = ", E2_num2
+        IF (Iprint > 1) WRITE(*,15), i, "-th state energy: ", Aval_THO(i), " <",I_state," | X^2 |Avec(",i,")> = ", E2_num2
         ! SAVING E2
         WRITE(78,11)  Aval_THO(i), E2_num2**2
         Total_E2(i_state) = Total_E2(i_state) + (E2_num2**2)
