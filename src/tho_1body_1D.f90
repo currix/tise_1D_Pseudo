@@ -2,7 +2,8 @@ PROGRAM THO_1BODY_1D
   !
   ! PROGRAM THAT SOLVES THE 1D TISE USING A TRUNCATED HO BASIS
   !
-  ! $Id: tho_1body_1D.f90,v 1.12 2013/10/05 17:49:19 curro Exp $
+  ! Last rcs controlled version info
+  !  $Id: tho_1body_1D.f90,v 1.12 2013/10/05 17:49:19 curro Exp $
   !
   ! by Currix TM
   !
@@ -524,7 +525,7 @@ PROGRAM THO_1BODY_1D
   ENDIF
   !
   !
-  IF( I_toten == 1) THEN
+  IF( I_toten /= 0) THEN
      !CALCULATING E1
      CALL E1_THO(Iprint, I_toten)
      !
