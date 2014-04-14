@@ -96,9 +96,17 @@ NAGLIB = -L/usr/local/lib/NAG -lnag
 LIBS     = $(NAGLIB) $(LAPACK95) $(LAPACK77) $(BLAS)
 
 all: HO THO ISQW
+all_static: HO_static THO_static ISQW_static
+#
 HO: wsaxon_HO_1body_1D ht_HO_1body_1D pt_HO_1body_1D morse_HO_1body_1D
+HO_static: wsaxon_HO_1body_1D_static ht_HO_1body_1D_static pt_HO_1body_1D_static morse_HO_1body_1D_static
+#
 THO: wsaxon_THO_1body_1D pteller_THO_1body_1D
+THO_static: wsaxon_THO_1body_1D_static pteller_THO_1body_1D_static
+#
 ISQW: wsaxon_ISQW_1body_1D ht_ISQW_1body_1D pteller_ISQW_1body_1D morse_ISQW_1body_1D
+ISQW_static: wsaxon_ISQW_1body_1D_static ht_ISQW_1body_1D_static pteller_ISQW_1body_1D_static morse_ISQW_1body_1D_static
+#
 .PHONY : all
 #
 # Standard compilation rules
@@ -122,11 +130,25 @@ pt_HO_1body_1D: $(1body_1D_HO_pt_OBJ)
 morse_HO_1body_1D: $(1body_1D_HO_morse_OBJ)
 	$(FC) -o $(BINPATH)/morse_1body_1D_HO  $(1body_1D_HO_morse_OBJ) $(LIBS) 
 #######################
+wsaxon_HO_1body_1D_static: $(1body_1D_HO_wsaxon_OBJ)
+	$(FC) -static -o $(BINPATH)/wsaxon_1body_1D_HO  $(1body_1D_HO_wsaxon_OBJ) $(LIBS) 
+ht_HO_1body_1D_static: $(1body_1D_HO_ht_OBJ)
+	$(FC) -static -o $(BINPATH)/ht_1body_1D_HO  $(1body_1D_HO_ht_OBJ) $(LIBS) 
+pt_HO_1body_1D_static: $(1body_1D_HO_pt_OBJ)
+	$(FC) -static -o $(BINPATH)/pteller_1body_1D_HO  $(1body_1D_HO_pt_OBJ) $(LIBS) 
+morse_HO_1body_1D_static: $(1body_1D_HO_morse_OBJ)
+	$(FC) -static -o $(BINPATH)/morse_1body_1D_HO  $(1body_1D_HO_morse_OBJ) $(LIBS) 
+#######################
 #######################
 wsaxon_THO_1body_1D: $(1body_1D_THO_wsaxon_OBJ)
 	$(FC) -o $(BINPATH)/wsaxon_1body_1D_THO  $(1body_1D_THO_wsaxon_OBJ) $(LIBS) 
 pteller_THO_1body_1D: $(1body_1D_THO_pteller_OBJ)
 	$(FC) -o $(BINPATH)/pteller_1body_1D_THO  $(1body_1D_THO_pteller_OBJ) $(LIBS) 
+#######################
+wsaxon_THO_1body_1D_static: $(1body_1D_THO_wsaxon_OBJ)
+	$(FC) -static -o $(BINPATH)/wsaxon_1body_1D_THO  $(1body_1D_THO_wsaxon_OBJ) $(LIBS) 
+pteller_THO_1body_1D_static: $(1body_1D_THO_pteller_OBJ)
+	$(FC) -static -o $(BINPATH)/pteller_1body_1D_THO  $(1body_1D_THO_pteller_OBJ) $(LIBS) 
 #######################
 #######################
 wsaxon_ISQW_1body_1D: $(1body_1D_ISQW_wsaxon_OBJ)
@@ -137,6 +159,16 @@ pteller_ISQW_1body_1D: $(1body_1D_ISQW_pt_OBJ)
 	$(FC) -o $(BINPATH)/pteller_1body_1D_ISQW  $(1body_1D_ISQW_pt_OBJ) $(LIBS) 
 morse_ISQW_1body_1D: $(1body_1D_ISQW_morse_OBJ)
 	$(FC) -o $(BINPATH)/morse_1body_1D_ISQW  $(1body_1D_ISQW_morse_OBJ) $(LIBS) 
+#######################
+wsaxon_ISQW_1body_1D_static: $(1body_1D_ISQW_wsaxon_OBJ)
+	$(FC) -static -o $(BINPATH)/wsaxon_1body_1D_ISQW  $(1body_1D_ISQW_wsaxon_OBJ) $(LIBS) 
+ht_ISQW_1body_1D_static: $(1body_1D_ISQW_ht_OBJ)
+	$(FC) -static -o $(BINPATH)/ht_1body_1D_ISQW  $(1body_1D_ISQW_ht_OBJ) $(LIBS) 
+pteller_ISQW_1body_1D_static: $(1body_1D_ISQW_pt_OBJ)
+	$(FC) -static -o $(BINPATH)/pteller_1body_1D_ISQW  $(1body_1D_ISQW_pt_OBJ) $(LIBS) 
+morse_ISQW_1body_1D_static: $(1body_1D_ISQW_morse_OBJ)
+	$(FC) -static -o $(BINPATH)/morse_1body_1D_ISQW  $(1body_1D_ISQW_morse_OBJ) $(LIBS) 
+#######################
 #######################
 clean:
 	@rm -f $(1body_1D_HO_wsaxon_OBJ)  $(1body_1D_HO_ht_OBJ) $(1body_1D_THO_wsaxon_OBJ) $(1body_1D_ISQW_wsaxon_OBJ) $(1body_1D_ISQW_pt_OBJ) $(1body_1D_HO_morse_OBJ)
