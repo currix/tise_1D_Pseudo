@@ -9,6 +9,6 @@ Transformed Harmonic Oscillator
 Box
 
 
-Makes use of minpack and intlib libraries.
+Makes use of lapack95, minpack, and intlib libraries.
 
 by Currix TM

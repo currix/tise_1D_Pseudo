@@ -1,3 +1,25 @@
+LAPACK95
+
+1
+L. S. BLACKFORD, J. DONGARRA, J. DU CROZ, S. HAMMARLING, AND J. WASNIEWSKI, 
+A Fortran 90 Interface for LAPACK, 
+Computer Science Dept. Technical Report CS-96-341, University of Tennessee, Knoxville, TN, 1996. 
+(Also LAPACK Working Note #117).
+
+2
+J. DONGARRA, W. OWCZARZ, J. WASNIEWSKI, AND P. YALAMOV, 
+Testing Software for LAPACK90, 
+Computer Science Dept. Technical Report CS-98-401, University of Tennessee, Knoxville, TN, 1998. 
+(Also LAPACK Working Note #138).
+
+3
+Vincent Allan Barker, L. Susan Blackford, Jack Dongarra, Jeremy Du Croz, Sven Hammarling, 
+Minka Marinova, Jerzy Wasniewski, Plamen Yalamov,
+LAPACK95 Users' Guide
+SIAM, Society for Industrial and Applied Mathematics, Series SIAM: Software, Environments and Tools
+2001,
+
+
 MINPACK
 
 1
