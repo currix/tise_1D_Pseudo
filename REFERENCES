@@ -13,11 +13,14 @@ Computer Science Dept. Technical Report CS-98-401, University of Tennessee, Knox
 (Also LAPACK Working Note #138).
 
 3
-Vincent Allan Barker, L. Susan Blackford, Jack Dongarra, Jeremy Du Croz, Sven Hammarling, 
-Minka Marinova, Jerzy Wasniewski, Plamen Yalamov,
+Vincent Allan Barker, L. Susan Blackford, Jack Dongarra, Jeremy Du Croz, Sven Hammarling,
+Minka Marinova, Jerzy Wasniewski, and Plamen Yalamov,
 LAPACK95 Users' Guide
 SIAM, Society for Industrial and Applied Mathematics, Series SIAM: Software, Environments and Tools
+Address 3600 University City Science Center, Philadelphia, PA 19104-2688, USA
 2001,
+ISBN / ISSN     ISBN 0-89871-504-0 (pbk.)
+Publication link        http://www.netlib.org/lapack95/lug95/
 
 
 MINPACK
