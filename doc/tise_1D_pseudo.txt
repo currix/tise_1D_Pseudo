@@ -1,0 +1,1230 @@
+
+                       `tise_1D_pseudo' User's Guide
+                       -----------------------------
+
+             Curro Perez-Bernal <francisco.perez@dfaie.uhu.es>
+
+                Laura Moschini <laura.moschini@pd.infn.it>
+
+                                 Version 1
+
+
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+
+
+Contents
+--------
+
+     1.        Introduction
+     1.1.      What's `tise_1D_pseudo'?
+     1.2.      Copyright statement
+
+     2.        Installation guide
+
+     3.        Getting Started
+     3.1.      Input file for the Harmonic Oscillator (HO) basis case
+     3.2.      Eigenvalue calculation codes
+     3.3.      Eigenvalues and eigenstates calculation code `avec_U3_gen_T'
+     3.4.      Calculation of observables of interest
+
+     4.        References
+
+
+-------------------------------------------------------------------------------
+
+
+1. Introduction
+---------------
+
+
+1.1. What's `tise_1D_pseudo'?
+-----------------------------
+
+     The `Fortran 90' programs and `Perl' scripts in the `tise_1D_pseudo'
+     suite solve the one dimensional time-independent Schroedinger equation
+     for a one body problem and for several potentials using a expansion in
+     three possible bases: harmonic oscillator (HO), transformed harmonic
+     oscillator (THO), and infinite square well box (BOX).  The full
+     spectrum and eigenstates are computed.  This includes both the
+     (negative energy) bound states and the positive energy pseudostates
+     that discretize the continuum part of the spectrum (positive
+     energies).
+
+
+1.2. Copyright statement
+------------------------
+
+     Copyright (2013-) Francisco Perez-Bernal
+
+     All Rights Reserved
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 3 of the License, or (at
+     your option) any later version.
+
+     The full text of the GPL is given in `/usr/share/common-licenses/GPL'
+     or in the FSF website GPL license definition
+     (http://www.gnu.org/copyleft/gpl.html).
+
+
+-------------------------------------------------------------------------------
+
+
+2. Installation guide
+---------------------
+
+     The libraries lapack95, minpack, and intlib libraries are needed.  The
+     program files can be found in `git' and a zip file can be dowloaded
+     using `wget' as follows
+
+          wget https://github.com/currix/tise_1D_Pseudo/archive/master.zip
+
+     The files should be unpacked followed by the usual compilation steps
+
+$ unzip master.zip
+Archive:  master.zip
+3309629b189bc4a2ca777862fd102d7df45276bf
+   creating: tise_1D_Pseudo-master/
+ extracting: tise_1D_Pseudo-master/.gitignore
+  inflating: tise_1D_Pseudo-master/LICENSE
+      .
+      .
+      .
+  inflating: tise_1D_Pseudo-master/test/tho_wsaxon_1D_1body.inp
+$ ls
+master.zip  tise_1D_Pseudo-master/
+$ cd tise_1D_Pseudo-master/
+$ ls
+bin/  LICENSE  README  REFERENCES  src/  test/
+$ cd src/
+$ make clean
+[pts/4][curro.deckard: src]$ make all
+gfortran -c  -Wall -I/usr/local/lib/lapack95/lapack95_modules -I/usr/local/include/lapack95_modules -c nrtype.f90
+     .
+     .
+     .
+gfortran -o ../bin//morse_1body_1D_ISQW  nrtype.o constants.o pot_param.o egs_mod_isqw.o infsq_box_1D.o build_ISQW_bas.o ham_mat_1D_1body_isqw.o e1_isqw.o e2_isqw.o ew_sum_rule.o total_strength.o morse_pot.o phase_shift_HT.o -L/usr/local/lib/NAG -lnag -L/usr/local/lib/lapack95 -llapack95 -L/usr/local/lib -llapack95 -llapack -lblas
+
+     The directory structure is the following
+
+     1.   `bin': executable files.
+
+     2.   `src': `Fortran 90' source files and `Makefile'.
+
+     3.   `doc': program documentation (this file) in several formats.
+
+     4.   `test': input files
+
+     Most of the program names follow the convention
+     <potential>`_1body_1D_'<BAS> where the potentials included are
+     <potential>
+
+     1.   Woods Saxon (`wsaxon')
+
+     2.   Woods Saxon with a barrier (`barrierws')
+
+     3.   Mexican hat (`mexhat')
+
+     4.   Ginocchio (`ginocchio')
+
+     5.   Morse (`morse')
+
+     6.   Poeschl-Teller (`pteller')
+
+     7.   Hazi and Taylor (`ht').
+
+     The available bases for the Hamiltonian construction and
+     diagonalization are
+
+     1.   Harmonic Oscillator (HO)
+
+     2.   Transformed Harmonic Oscillator (THO)
+
+     3.   Infinite Square Well Box (ISQW)
+
+     Other executable files:
+
+     1.   `program_launcher_1body_N': `Perl' script to launch the provided
+          programs to look for energy convergence or to prepare grace
+          figure files.
+
+     2.   `dBde_script': `Perl' script to compute dB/dE from the B1 or B2
+          program output for pseudostates.
+
+     If the programs works correctly in your system you can also, running
+     as _root_ user, install them, by default under the directory
+     `/usr/local/bin'.  The associated Perl scripts will also be installed
+     in this directory.  In this case it is very convenient to add the
+     directory`/usr/local/bin' to the default `$PATH' variable.  As
+     aforementioned, in order to install the program it you should do it as
+     superuser or using `sudo'
+
+          $ sudo make install
+          [sudo] password for sudouser:
+          $ ls  /usr/local/bin/
+
+     If you want to remove these files you can also do it executing `sudo
+     make uninstall'.
+
+
+-------------------------------------------------------------------------------
+
+
+3. Getting Started
+------------------
+
+     We proceed to describe the input file and the program execution for
+     each case.
+
+
+3.1. Input file for the Harmonic Oscillator (HO) basis case
+-----------------------------------------------------------
+
+     The provided input file is a `namelist' input file with the following
+     structure (e.g.  `test/harm_osc_1D_1body_wsaxon.inp'
+
+#
+#       INPUT FILE FO HO_1BODY_1DR
+#
+&INP_X     X_MIN = -130.0, X_MAX = 130.0 /
+&INP_DIM   DIM_X = 1501, DIM_HO = 250 /
+&INP_MASS  IAD = 4, REDUCED_MASS = 0.975 /
+&INP_POT   PARAM_POT = -50.0, 2.0, 0.4, 0.0, 0.0  /
+&INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
+#
+&INP_AUX   I_gs = 0, Isave_EN = 1, Isave_WF = 0, Isave_BAS = 0, I_sumr = 0, I_toten = 3, Iprint = 2 /
+
+     Variables defined:
+
+     1.   `X_MIN, X_MAX': _float_ type.  Spatial interval where the
+          harmonic oscillator basis is defined expressed in _fm_ units.
+
+     2.   `DIM_X': _integer_ type.  Number of points in the spatial grid
+          from `X_MIN' to `X_MAX'.
+
+     3.   `DIM_HO': _integer_ type.  Size of the truncated HO basis used in
+          the calculation.
+
+     4.   `IAD': _integer_ type.  If `IAD = 1' then unitless quantities are
+          defined (hbar^2/1 amu = 1) and `kmin = 1' else we optimize the
+          `kmin' value to minimize the energy of the ground state using a
+          N=1 basis.  (To Do: recipe for weakly bound states).
+
+     5.   `REDUCED_MASS': _float_ type.  Reduced mass of the system
+          expressed in _amu_.
+
+     6.   `PARAM_POT': _float_ type.  Potential parameters.
+
+     7.   `I_PHASE': _integer_ type.  If this variable is not zero the
+          phase shifts are computed using the Hazi and Taylor approach.
+
+     8.   `LAMBDA': _float_ type.  Lambda parameter in the Hazi and Taylor
+          calculation of the phase shift[1].
+
+     9.   `I_gs': _integer_ type.  If `I_gs = 1' the `gs_wavefunction.dat'
+          file is saved with the system ground state wavefunction and a
+          header with the system info.
+
+     10.  `Isave_EN': _integer_ type.  If `Isave_EN = 1' the following data
+          are saved.  The system eigenvalues are saved in a file with name
+          `ho_eigenvalues_N<dimbasis>.dat' file is saved (unit 73) with the
+          system eigenvalues and a header with the system info.  The system
+          potential and eigenstates are saved in a file with name
+          `ho_poteigvec_N<dimbasis>.dat' file (unit 74) with the following
+          format
+
+x  Potential(x) 10xEigvec_1(x)+Eigval(1) 10xEigvec_2(x)+Eigval(2) .... 10xEigvec_dim(x)+Eigval(2)
+
+          Another file, named `ho_pot_eigvec2_N<dimbasis>.dat' file is
+          saved (unit 75) with the same format than the previous one but
+          storing the squared values of the wavefunctions as a function of
+          the spatial coordinate.
+
+     11.  `Isave_WF': _integer_ type.  If `Isave_WF = 1' the eigenvectors
+          and eigenvector derivatives are saved in files named
+          `ho_eigenvectors_N<dimbasis>.dat' and
+          `ho_eigvec_der_N<dimbasis>.dat' with the format
+
+               x  Eigvec_1(x) Eigvec_2(x) ... Eigvec_dim(x)
+
+          The units involved are unit 71 and 72, respectively.
+
+     12.  `Isave_BAS': _integer_ type.  If `Isave_BAS = 1' the harmonic
+          oscillator basis wavefunctions are saved in a file named
+          `ho_basis_N<dimbasis>.dat' with the format
+
+               x  ho_1(x) ho_2(x) ... ho_dim(x)
+
+          The unit involved is unit 70.
+
+     13.  `I_sumr': _integer_ type.  If `I_sumr' is nonzero (and positive)
+          the sum rules for the total strength is computed for the first
+          `I_sumr' eigenstates and the energy weighted strength is computed
+          for the ground state.  Results are displayed.
+
+     14.  `I_toten': _integer_ type.  If `I_toten' is nonzero (and
+          positive) the B1 and B2 values of the transitions of the first
+          `I_toten' eigenstates to the rest of the states are computed.
+
+     15.  `IPRINT': _integer_ type.  Program output verbosity.  Mainly for
+          debugging purposes.  Possible values in the interval 0-5.
+
+     The information provided to `Minuit' for the algebraic spectroscopic
+     parameter optimization is given in a file.  The structure of this file
+     is a three column list including the parameter labels, its initial
+     values and initial minimization steps for the fourteen possible
+     Hamiltonian parameters.  This is followed by a statement using the
+     `Minuit' command `fix' to indicate what parameter should be kept
+     constant at the initial value.  The file ends with the `Minuit'
+     commands for the optimization.  More information can be found in the
+     Fortran Minuit Manual
+     (http://wwwasdoc.web.cern.ch/wwwasdoc/minuit/minmain.html) and in the
+     `Minuit' homepage (See Chapter 4, `References').
+
+          SET TITLE
+          'MINUIT MINIMIZATION. BENDING DYNAMICS'
+          PARAMETERS
+          1     'P11 '  6.129D+02         0.1D-02
+          2     'P21 '  9.9D+00           0.1D-02
+          3     'P22 '  0.30D+00          0.1D-02
+          4     'P23 '  -1.03D+00         0.1D-02
+          5     'P31 '  0.0D+00           0.0D+00
+          6     'P32 '  0.0D+00           0.0D+00
+          7     'P33 '  0.0D+00           0.0D+00
+          8     'P41 '  0.0D+00           0.0D+00
+          9     'P42 '  0.0D+00           0.0D+00
+          10    'P43 '  0.0D+00           0.0D+00
+          11    'P44 '  0.0D+00           0.0D+00
+          12    'P45 '  0.0D+00           0.0D+00
+          13    'P46 '  0.0D+00           0.0D+00
+          14    'P47 '  0.0D+00           0.0D+00
+          
+          fix  5 7 8 9 10 11 12 13 14
+          #set err 1.0D-05
+          minimize 3000
+          call 3
+          exit
+
+     The parameters have labels `P'<nm>, where <n> = 1,2,3,4 indicates that
+     the operator is <n>-th body, and <m> is an index to distinguish
+     between the different operators of the same order.  From the
+     Hamiltonian building subroutine `hbldu3_gen.f':
+
+            H = P11 n +
+                P21 n^2 + P22 l^2 + P23 W^2 +
+                P31 n^3 + P32 n·l^2 + P33 (n·W^2 + W^2·n) +
+                P41 n^4 + P42 n^2·l^2 + P43 l^4 + P44 l^2·W^2 +
+                P45 (n^2·W^2 + W^2·n^2) + P46 W^4 +
+                P47 (W^2·Wbar^2 + Wbar^2·W^2)/2
+
+     where `n' is the U(2) number operator, `l' is the vibrational angular
+     momentum, `W^2' is the second order Casimir operator associated so
+     SO(3), and `Wbar^2' is the Casimir operator of the SObar(3)
+     subalgebra.
+
+[1]  See A.  U.  Hazi and H.  S.  Taylor.  Phys.  Rev.  A, _1_:1109–1120,
+     1970.
+
+3.1.1. Program Execution
+------------------------
+
+     The `Perl' script `minuit_U3_genH', under the directory
+     `triat_U3_2.2.1/bin', is provided as a convenient interface to launch
+     the `Fortran' optimization program.  It creates a temporary directory
+     where the program runs and, in this way, several instances of the
+     program can be executed simultaneously.
+
+     In the following
+
+     If the script is executed with no argument it displays a brief help
+     message.
+
+triat_U3_2.2.1/examples/XCNO$ ../../bin/minuit_U3_genH
+
+Usage: minuit_U3_genH [-vtS] minpar_file input_file output_file
+       minuit_U3_genH [-vt] [-e prgfile] minpar_file input_file output_file
+ Options:
+          t :  do not remove temporary directory
+          e :  minimization program
+          S :  execute the statically linked program
+          v :  verbose output
+
+     The important options are `-e' and `-t'.  The first one implies that
+     the user will provide the name (and path) of the executable program
+     file to be launched, while the second option indicates -mainly for
+     debugging purposes- that the temporary directory `tmpdir_XXXX' is not
+     going to be removed once the program execution finishes.  The
+     option,`-s', implies the use of the statically linked program
+     `tri_min_Tstat'.  Finally, the option `-v' forces a verbose output.
+     If the option `-e' is absent, the script tries to locate the program
+     and execute it.
+
+     The script is invoked with three arguments.  The first, <minpar_file>
+     is the file with the parameter input for `Minuit'.  The second
+     argument, <input_file>, is the general input (see ).  The last
+     argument is <output_file>, the name of the file with the program
+     output.  See Section 3.1.2, `Examples' to check the application of the
+     program to two cases, one corresponding to a linear molecule and the
+     other to a bent molecule.
+
+3.1.2. Examples
+---------------
+
+3.1.2.1. Linear Molecule Example: Fulminic Acid Large Amplitude Bending
+Mode
+----------------------------------------------------------------------------
+
+     The files necessary to run this example are located under the
+     directory `examples/XCNO'
+
+          triat_U3_2.1$ cd examples/XCNO/
+          triat_U3_2.1/examples/XCNO$ ls
+          exp_FulminicD_Feb03.dat   minuit_genpar_FulminicD
+          exp_FulminicH_Feb03.dat   minuit_genpar_FulminicH
+          input_U3_minuit_FulminicD output_FulminicD.orig
+          input_U3_minuit_FulminicH output_FulminicH.orig
+
+     The files `exp_FulminicH_Feb03.dat' and `exp_FulminicD_Feb03.dat'
+     contain the available experimental information for the large amplitude
+     bending vibration of fulminic acid and its deuterated isotopologue,
+     and they conform to the standard described in The general input file
+     in this case is called `input_U3_minuit_FulminicH' (and
+     `input_U3_minuit_FulminicD' in the deuterated molecule case).
+
+     The information for the algebraic spectroscopic parameter optimization
+     is provided in files `minuit_par_FulminicH' and `minuit_par_FulminicD'
+     for HCNO and DCNO, respectively.
+
+     The program is executed invoking the `Perl' script with the already
+     mentioned three arguments.
+
+     The verbose execution of the program for the fulminic acid case for
+     both species is launched with the following commands:
+
+          triat_U3_2.2.1/examples/XCNO$ ../../bin/minuit_U3_genH -v \
+          > -e ~/triat_U3_2.2.1/bin/tri_min_T \
+          > minuit_genpar_FulminicD input_U3_minuit_FulminicD output_FulminicD
+          
+          Minuit CHISQRE minimization. U(3) General Hamiltonian.
+          Executable program: ~/triat_U3_2.2.1/bin/tri_min_T
+          Making temporary directory ... Done.
+          Experimental energy file name is: exp_FulminicD_Feb03.dat
+          Copying files to temporary directory ... Done.
+          Running optimization program ... Done.
+          Copying output file from temporary directory ... Done.
+          Removing temporary directory ... Done.
+          triat_U3_2.2.1/examples/XCNO$
+          triat_U3_2.2.1/examples/XCNO$ ../../bin/minuit_U3_genH -vS
+          minuit_genpar_FulminicD \
+          > input_U3_minuit_FulminicH output_FulminicH
+          
+          Minuit CHISQRE minimization. U(3) General Hamiltonian.
+          Executable program: ../../bin/tri_min_Tstat
+          Making temporary directory ... Done.
+          Experimental energy file name is: exp_FulminicH_Feb03.dat
+          Copying files to temporary directory ... Done.
+          Running optimization program ... Done.
+          Copying output file from temporary directory ... Done.
+          Removing temporary directory ... Done.
+
+     In the HCNO case the static version of the program is employed.  The
+     final part of the output in these two cases, once convergence is
+     reached, is included in files `output_Fulminic_HCNO.orig' and
+     `output_Fulminic_DCNO.orig'.
+
+     Notice that the quality of the fit is given in terms of the standard
+     deviation and not the rms.  To compute the rms of the fit it is
+     necessary to multiply the standard deviation by the square root of the
+     total number of experimental data and divide it between the square
+     root of the total number of experimental data minus the number of free
+     parameters.
+
+3.1.2.2. Bent Molecule Example: Methinophosphide A Excited Electronic State
+Bending Mode
+----------------------------------------------------------------------------
+
+     The files necessary to run this example are located under the
+     directory `HCP_A'.
+
+          triat_U3_2.2.1$ cd examples/HCP_A/
+          triat_U3_2.2.1/examples/HCP_A$ ls
+          exp_HCP_A_bending.dat  minuit_genpar_HCP_A
+          input_U3_minuit_HCP_A  output_HCP_A_orig
+
+     The program is executed in the same way than in the linear case
+
+triat_U3_2.2.1/examples/HCP_A$ ../../bin/minuit_U3_genH -v minuit_genpar_HCP_A \
+> input_U3_minuit_HCP_A output_HCP_A
+
+Minuit CHISQRE minimization. U(3) General Hamiltonian.
+Executable program: ../../../bin/tri_min_T
+Making temporary directory ... Done.
+Experimental energy file name is: exp_HCP_A_bending.dat
+Copying files to temporary directory ... Done.
+Running optimization program ... Done.
+Copying output file from temporary directory ... Done.
+Removing temporary directory ... Done.
+
+     Last part of the output is saved on file `output_HCP_A_orig' in order
+     that the use can compare the results.
+
+
+3.2. Eigenvalue calculation codes
+---------------------------------
+
+     There are three possible codes for the calculation of the Hamiltonian
+     eigenvalues.  The first one, `en_U3_gen_T' is valid for the general,
+     fourteen-parameter, Hamiltonian, while the other two, `en_U3_mh' and
+     `en_U3_mh_trid', are valid for a simplified model Hamiltonian, with
+     only two parameters: the pairing and the number operator.
+
+3.2.1. Eigenvalue calculation code `en_U3_gen_T'
+------------------------------------------------
+
+     Under the directory `triat_U3_2.2.1/examples/Eigenvalues' one example
+     of use of this program can be found.
+
+3.2.1.1. Input Files and Program Execution
+------------------------------------------
+
+     The input file for this program is rather simple.  An example input
+     file with all parameters equal to zero called `input_file' is
+     provided.  A possible input file is
+
+           10		# N      INPUT FILE
+           0  		# l
+           2  		# iopts
+           0.0d0	 	# P11
+           0.0d0		# P21
+           0.0d0  	# P22
+           -10.0d0  	# P23
+           0.0d0  	# P31
+           0.0d0  	# P32
+           0.0d0  	# P33
+           0.0d0  	# P41
+           0.0d0  	# P42
+           0.0d0  	# P43
+           0.0d0  	# P44
+           0.0d0  	# P45
+           0.0d0  	# P46
+           0.0d0  	# P47
+
+     The parameter `N' is the value of the totally symmetric U(3)
+     representation used to model the system.  As version 2.1 the maximum
+     possible `N' value is 6000.  The vibrational angular momentum is given
+     by the `l' value.
+
+     The parameter `iopts' controls the output of the eigenvalues.
+     Possible values are
+
+        * `iopts' = 0 the program displays only the ground state energy.
+
+        * `iopts' = 1 the program displays all energies.
+
+        * `iopts' = 2 the program displays all excitation energies (with
+          g.s.  (l=0) energy = 0)
+
+     For debugging purposes, in the source file `enrgy_gen_U3.f' there is a
+     variable fixed at zero, called `IPRINT'.  Nonzero positive values
+     increase the level of verbosity of the program.
+
+     This `Fortran' program is directly launched, providing the described
+     input file as the standard input.  If we execute the program with the
+     input file `input_file_doc' given as an example the result is
+
+triat_U3_2.2.1/examples/Eigenvalues$ ../../bin/en_U3_gen_T < input_file_doc
+   0.0000000000000000
+   380.00000000000011
+   680.00000000000023
+   900.00000000000023
+   1040.0000000000002
+   1100.0000000000002
+
+3.2.1.2. Examples
+-----------------
+
+     The files necessary to run this example are located under the
+     directory `examples/Eigenvalues'
+
+          triat_U3_2.2.1/examples/Eigenvalues$ ls
+          input_file  input_file_doc  input_file_HCP
+
+     The obtention of the eigenvalues that correspond to the parameters
+     obtained in the fit to the HCP A state are, for zero vibrational
+     angular momentum
+
+triat_U3_2.2.1/examples/Eigenvalues$ ../../bin/en_U3_gen_T < input_file_HCP
+   0.0000000000000000
+   566.85562373229914
+   1028.5555120308779
+   1484.2632344381639
+   2046.9932672140753
+   2689.7360152596357
+   3382.0393187789541
+   4103.8525588498451
+   4838.4084093582642
+   5569.7433116564898
+   6281.1719539978449
+   6953.5491948507433
+   7562.3703503418556
+   8078.6701738697175
+   8529.0156142688957
+
+3.2.2. Eigenvalue calculation code `en_U3_mh'
+---------------------------------------------
+
+     Under the directory `triat_U3_2.2.1/examples/Eigenvalues' one example
+     of use of this program can be found.  The `LAPACK' subroutine used for
+     diagonalization is `DSYEV'.
+
+3.2.2.1. Input Files and Program Execution
+------------------------------------------
+
+     The input file for this program is rather simple.  An example input
+     file with all parameters equal to zero is provided (file
+     `input_file_mh').  A possible input file is
+
+           10		# N      INPUT FILE
+           0  		# l
+           2  		# iopts
+           1.0d0	 	# scale
+           0.5d0		# xi
+
+     The parameter `N' is the value of the totally symmetric U(3)
+     representation used to model the system.  As version 2.2.1 the maximum
+     possible `N' value is 6000.  The vibrational angular momentum is given
+     by the `l' value.
+
+     The parameter `iopts' controls the output of the eigenvalues.
+     Possible values are
+
+        * `iopts' = 0 the program displays only the ground state energy.
+
+        * `iopts' = 1 the program displays all energies.
+
+        * `iopts' = 2 the program displays all excitation energies (with
+          g.s.  (l=0) energy = 0)
+
+     For debugging purposes, in the source file `enrgy_modelH_U3_tri.f'
+     there is a variable fixed at zero, called `IPRINT'.  Nonzero positive
+     values increase the program verbosity.
+
+3.2.2.2. Examples
+-----------------
+
+     The recommended way of computing eigenvalues is making use of the
+     `Perl' script `alg_U3_energy' described below in Section 3.4.3, `Model
+     and General Hamiltonian Eigenvalues'.  This `Fortran' program can also
+     be directly launched, providing the described input file as the
+     standard input.  If we execute the program with the provided input
+     file `input_file_mh_doc', located in the directory
+     `examples/Eigenvalues', the result is
+
+triat_U3_2.2.1/examples/Eigenvalues$ ../../bin/en_U3_mh < input_file_mh_doc
+   0.0000000000000000
+   2.0025471824580259
+   3.4348964743602903
+   4.7423306229038324
+   6.5330201878030874
+   8.7380263091129393
+
+3.2.3. Eigenvalue calculation code `en_U3_mh_trid'
+--------------------------------------------------
+
+     Under the directory `triat_U3_2.2.1/examples/Eigenvalues' one example
+     of use of this program can be found.
+
+3.2.3.1. Input Files and Program Execution
+------------------------------------------
+
+     As in the previous case, the input file for this program is quite
+     simple.  An example input file with all parameters equal to zero is
+     provided (file `input_file_mh').  A possible input file is
+
+           10		# N      INPUT FILE
+           0  		# l
+           2  		# iopts
+           1.0d0	 	# scale
+           0.5d0		# xi
+
+     Again, the parameter `N' is the value of the totally symmetric U(3)
+     representation used to model the system.  The present program uses for
+     the matrix diagonalization a `LAPACK' subroutine that takes advantage
+     of the fact that the matrix is tridiagonal and symmetric (subroutine
+     `DSTEVX').  The computing time is larger compared to the `en_U3_mh'
+     program, but it is more stable numerically and it permits to reach
+     larger N values.  It also allows for the calculation of a limited
+     subset of eigenvalues.  As version 2.2.1 the maximum possible `N'
+     value in this case is 40000.  The vibrational angular momentum is
+     given by the `l' value.
+
+     The parameter `iopts' controls the output of the eigenvalues.
+     Possible values are
+
+        * `iopts' = 0 the program displays only the ground state energy.
+
+        * `iopts' = 1 the program displays all energies.
+
+        * `iopts' = 2 the program displays all excitation energies (with
+          g.s.  (l=0) energy = 0)
+
+        * `iopts' > 2 the program calculates and displays the first `iopts'
+          excitation energies (with g.s.  (l=0) energy = 0)
+
+     For debugging purposes, in the source file `enrgy_modelH_U3_tri.f'
+     there is a variable fixed at zero, called `IPRINT'.  Nonzero positive
+     values increase the program verbosity.
+
+3.2.3.2. Examples
+-----------------
+
+     This `Fortran' program can be directly launched, providing the
+     described input file as the standard input.  It is recommended to use
+     the `Perl' script `alg_U3_energy', decribed in Section 3.4.3, `Model
+     and General Hamiltonian Eigenvalues', to compute system eigenvalues.
+     If we execute the program with the provided input file
+     `input_file_mh_doc', located in the directory `examples/Eigenvalues',
+     the result is
+
+triat_U3_2.2.1/examples/Eigenvalues$ ../../bin/en_U3_mh_trid < input_file_mh_doc
+   0.0000000000000000
+   2.0025471824580254
+   3.4348964743602899
+   4.7423306229038316
+   6.5330201878030865
+   8.7380263091129429
+
+
+3.3. Eigenvalues and eigenstates calculation code `avec_U3_gen_T'
+-----------------------------------------------------------------
+
+     Under the directory `triat_U3_2.2.1/examples/Eigenstates' examples of
+     use of this program can be found.
+
+3.3.1. Input Files and Program Execution
+----------------------------------------
+
+     The input file for this program is the same that for the previous
+     program `en_U3_gen_T'.  An example input file with all parameters
+     equal to zero is provided
+
+           10		# N      INPUT FILE
+           0  		# l
+           2  		# iopts
+           0.0d0	 	# P11
+           0.0d0		# P21
+           0.0d0  	# P22
+           0.0d0  	# P23
+           0.0d0  	# P31
+           0.0d0  	# P32
+           0.0d0  	# P33
+           0.0d0  	# P41
+           0.0d0  	# P42
+           0.0d0  	# P43
+           0.0d0  	# P44
+           0.0d0  	# P45
+           0.0d0  	# P46
+           0.0d0  	# P47
+
+     See parameter explanation in Section 3.2.1, `Eigenvalue calculation
+     code `en_U3_gen_T''.
+
+     In the source file `avalavec_gen_U3.f' a variable named `TOL', whose
+     default value is `TOL = 1.0D-05' that makes equal to zero the square
+     of the components whose absolute value is less than `TOL'.
+
+     For debugging purposes, in the source file `avec_gen_U3.f' there is a
+     variable fixed at zero, called `IPRINT'.  Nonzero positive values
+     increase the level of verbosity of the program.
+
+     This `Fortran' program is directly launched, providing the described
+     input file as the standard input.  Each energy is followed by the
+     corresponding eigenstate expressed in the U(2) and SO(3) basis.  The
+     first column is the component, and the second the component squared,
+     followed by the basis state quantum labels.  If we execute the program
+     with the input file found above the result is
+
+triat_U3_2.2.1/examples/Eigenstates$ ../../bin/avec_U3_gen_T \
+> < input_file_doc
+
+ N =    10 , l =   0 , DIM =      6
+    Energy =           0.0000
+        Component U(2)         |  n ,  l  >        Component SO(3)        |  v ,  K  >
+      0.36932E-01  0.13640E-02 | 10 ,   0 >      0.53532E-17   0.0000     |  5 ,   0 >
+     -0.26115      0.68198E-01 |  8 ,   0 >      0.84737E-17   0.0000     |  4 ,   0 >
+      0.60309      0.36372     |  6 ,   0 >      0.76209E-16   0.0000     |  3 ,   0 >
+     -0.66066      0.43647     |  4 ,   0 >      0.75201E-16   0.0000     |  2 ,   0 >
+      0.35314      0.12471     |  2 ,   0 >     -0.65821E-15   0.0000     |  1 ,   0 >
+     -0.74448E-01  0.55424E-02 |  0 ,   0 >      -1.0000       1.0000     |  0 ,   0 >
+
+    Energy =           380.00
+        Component U(2)         |  n ,  l  >        Component SO(3)        |  v ,  K  >
+      0.11964      0.14313E-01 | 10 ,   0 >      0.30352E-15   0.0000     |  5 ,   0 >
+     -0.52450      0.27510     |  8 ,   0 >     -0.10342E-15   0.0000     |  4 ,   0 >
+      0.46888      0.21985     |  6 ,   0 >     -0.13730E-15   0.0000     |  3 ,   0 >
+      0.29962      0.89772E-01 |  4 ,   0 >     -0.25502E-15   0.0000     |  2 ,   0 >
+     -0.59486      0.35385     |  2 ,   0 >      -1.0000       1.0000     |  1 ,   0 >
+      0.21705      0.47111E-01 |  0 ,   0 >      0.32605E-15   0.0000     |  0 ,   0 >
+
+          .................................................................
+
+    Energy =           1100.0
+        Component U(2)         |  n ,  l  >        Component SO(3)        |  v ,  K  >
+      0.60779      0.36941     | 10 ,   0 >      -1.0000       1.0000     |  5 ,   0 >
+      0.42977      0.18470     |  8 ,   0 >     -0.12420E-15   0.0000     |  4 ,   0 >
+      0.37219      0.13853     |  6 ,   0 >      0.15755E-15   0.0000     |  3 ,   0 >
+      0.33976      0.11544     |  4 ,   0 >      0.35379E-16   0.0000     |  2 ,   0 >
+      0.31782      0.10101     |  2 ,   0 >      0.32559E-15   0.0000     |  1 ,   0 >
+      0.30151      0.90909E-01 |  0 ,   0 >      0.55052E-16   0.0000     |  0 ,   0 >
+
+triat_U3_2.2.1/examples/Eigenstates$
+
+3.3.2. Examples
+---------------
+
+     The files necessary to run this example are located under the
+     directory `examples/Eigenstates'
+
+          triat_U3_2.2.1/examples/Eigenstates$ ls
+          avec_HCP_A.dat input_file_doc  input_file_HCP
+
+     The obtention of the eigenvalues and eigenstates that correspond to
+     the parameters obtained in the fit to the HCP A state are, for zero
+     vibrational angular momentum, included in the file `avec_HCP_A.dat'.
+     You can reproduce this calculation as follows
+
+          triat_U3_2.2.1/examples/Eigenstates$ ../../bin/avec_U3_gen_T \
+          > < input_file_HCP > avec_HCP_A_new.dat
+
+3.3.3. Eigenvector calculation code `avec_U3_mh'
+------------------------------------------------
+
+     Under the directory `triat_U3_2.2.1/examples/Eigenvectors' one example
+     of use of this program can be found.  The `LAPACK' subroutine used for
+     diagonalization is `DSYEV'.  This program can display and, if
+     requested, save in a file name
+
+3.3.3.1. Input Files and Program Execution
+------------------------------------------
+
+     The input file for this program is rather simple.  An example input
+     file with all parameters equal to zero is provided (file
+     `input_file_mh').  A possible input file is
+
+           10		# N      INPUT FILE
+           0  		# l
+           2  		# iopts
+           1.0d0	 	# scale
+           0.5d0		# xi
+           .FALSE.        # lsave
+
+     The parameters `N', `l', and `iopts' play the same role than in the
+     eigenvalue calculation program `avec_U3_mh'.  The logical parameter
+     <lsave> controls the saving of the program output.  If `.TRUE.'  the
+     output is saved in file `u3_model_Ham_results.dat'.
+
+3.3.3.2. Examples
+-----------------
+
+     The file `input_file_mh_doc', located in the directory
+     `examples/Eigenstates', can be used to test the program the result is
+
+triat_U3_2.2.1/examples/Eigenstates$ ../../bin/avec_U3_mh < input_file_mh_doc
+          6
+   2.0544928335232679
+ -9.89109288407004003E-003          10           0
+  0.10702247936336659                8           0
+ -0.38507229495936940                6           0
+  0.67160435417509567                4           0
+ -0.58731580369455527                2           0
+  0.21017949717056550                0           0
+   .
+   .
+   .
+   10.792519142636207
+ -0.95238689984753599               10           0
+ -0.28724503833496851                8           0
+ -9.71809090966967437E-002           6           0
+ -3.06134933799240318E-002           4           0
+ -8.12286486006358333E-003           2           0
+ -1.47815676570819368E-003           0           0
+
+
+3.4. Calculation of observables of interest
+-------------------------------------------
+
+     We now proceed to describe a set of `Perl' scripts provided to
+     facilitate the calculation of different observables of interest.  The
+     sample and input files provided for these scripts are located in the
+     directory `triat_U3_2.2.1/examples/Observables'.
+
+3.4.1. Expectation value of the number of tau bosons operator
+-------------------------------------------------------------
+
+     The `Perl' script `expected_val_n' computes the expectation value of
+     the tau boson number operator with different options.  A basic help
+     can be obtained running the script with the `-h' option.
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/expected_val_n -h
+
+	Perl script to calculate the normalized expected value of
+the U(2) Casimir n for a given eigenstate u (g.s. -> u = 1) and a xi
+value interval, for all the eigenstates given a xi value, or for the
+eigenstates of a general Hamiltonian.
+
+	The expected value is normalized by the number of bosons N (<n>/N).
+
+ by Currix TM
+
+Usage: expected_val_n [-vhS] [-e progpath] -N Nval lval scale xi
+       expected_val_n [-vhS] [-e progpath] -E Nval lval scale xi
+       expected_val_n [-vhS] [-e progpath] Nval lval scale u ximin ximax xistep
+       expected_val_n [-vhS] [-e progpath] [-n] -g inputfile
+
+  Options:
+    N : expected value of n as a function of v (0, 1, 2, ... ) for all states
+    E : expected value of n as a function of energy
+        normalized by N for all states
+    S : execute statically linked Fortran program
+    v : verbose output
+    h : help message
+    g : general Hamiltonian (supply name of the parameter file)
+    n : normalize energies by N in the general Hamiltonian case or
+        or v by N if -N
+    e : provide the executable triat files
+
+     The script allows the user to compute the expected value of the number
+     operator for all the eigenstates for a given control parameter xi
+     value [1] For example, to compute the expected value of the number
+     operator in the eigenstates of the zero angular momentum, N = 10, and
+     xi = 0.4 Hamiltonian
+
+          triat_U3_2.2.1/examples/Observables$ ../../bin/expected_val_n -E \
+          10 0 1.0 0.4
+          0.227411444586968 0.282433724484853
+          0.375148937971884 0.209292031824226
+          0.489249830006017 0.275091429272299
+          0.63853518398931 0.506402309333926
+          0.831820286396651 0.740247061857603
+          1.06005653927139 0.986533443227093
+
+     If the dependence with the number of quanta, instead of the energy, is
+     required, the `-E' option is replaced by `-N'.
+
+     The expected value for a particular eigenstate and evaluated in an
+     interval of control parameter values can also be computed[2].  For
+     example, to compute the expected value of n for the ground state of
+     the zero angular momentum, N = 10, and 0.2 < xi < 0.4 Hamiltonian with
+     a step of 0.05 in the control parameter
+
+          triat_U3_2.2.1/examples/Observables$ ../../bin/expected_val_n \
+           10 0 1.0 1 0.2 0.4 0.05
+          0.2 0.0395832133992901
+          0.25 0.094015233850396
+          0.3 0.168639783188264
+          0.35 0.233906937667085
+          0.4 0.282433724484853
+
+     Finally, the last option is to compute the expectation value for the
+     eigenstates of a given general Hamiltonian.  To do so, a file with the
+     parameter values of the Hamiltonian has to be provided.  In the
+     examples directory you can find the file `input_file_HCP', with the
+     Hamiltonian parameters of the HCP molecule.  To compute the
+     expectation value of n for these eigenstates
+
+          triat_U3_2.2.1/examples/Observables$ ../../bin/expected_val_n \
+           -ng input_file_HCP
+          0 0.252375640144704
+          19.5468965517241 0.214629419159648
+          35.4689655172414 0.175676105843901
+          51.1827586206897 0.223634301458906
+          70.5862068965517 0.293699978181552
+          92.748275862069 0.354259363279492
+          116.620689655172 0.411790067302586
+          141.513793103448 0.468494422286793
+          166.841379310345 0.525142319743586
+          192.058620689655 0.582222581646207
+          216.593103448276 0.640168981577777
+          239.775862068966 0.699641599554915
+          260.772413793103 0.761652148046633
+          278.575862068966 0.817777007616914
+          294.103448275862 0.820195218254436
+
+     These results can be checked against the contents of the file
+     `expected_n_HCP.out'.
+
+[1]  This makes reference to the model Hamiltonian H = scale[(1-xi) n +
+     xi/(N-1) P].
+
+[2]  This makes reference to the model Hamiltonian H = scale[(1-xi) n +
+     xi/(N-1) P].
+
+3.4.2. Expectation value of the IR transition operator
+------------------------------------------------------
+
+     The `Perl' script `intensity_IR' computes the squared expectation
+     value of the infrared transition operator with different options[1].
+     A basic help can be obtained running the script with the `-h' option.
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/intensity_IR -h
+
+Perl script to calculate the infrared intensity for a dipole transition
+between eigenstates {l_1}_{u_1} and {l_2}_{u_2} of the U(3) model Hamiltonian
+in a given xi or N value interval or for a given xi value.
+
+Note that {l}_{u} stands for u-th eigenvector with l angular momentum (g.s. u=1).
+
+The computed matrix element is
+
+|<{l_2}_{u_2}|T_+|{l_1}_{u_1}>|^2 + |<{l_2}_{u_2}|T_-|{l_1}_{u_1}>|^2
+
+with the selection rule |l_1-l_2| = 1.
+
+
+     by Currix TM
+
+Usage: intensity_IR [-Sv] Nval l1 u1 l2 u2 scale xi
+
+       intensity_IR [-Sv] -s Nval l1 u1 l2 u2 scale ximin ximax xistep
+
+       intensity_IR [-Sv] -n Nmin Nmax Nstep l1 u1 l2 u2 scale xi
+
+       intensity_IR [-h]
+
+  Options:
+    S : execute statically linked Fortran program
+    v : verbose output
+    h : help message
+    s : consider a series of control parameter values
+    n : consider a series of  N values
+
+     The script allows the user to compute the squared expectation value of
+     the transition operator for a given pair of eigenstates of the model
+     Hamiltonian for a given control parameter xi value [2] For example, to
+     compute the transition intensity between the ground state (zero
+     angular momentum) and the first eigenstate with angular momentum equal
+     to one, in the N = 10, and xi = 0.4 Hamiltonian we will execute
+
+          triat_U3_2.2.1/examples/Observables$  ../../bin/intensity_IR \
+          > 10 0 1 1 1 1.0 0.4
+          
+           0.4       9.6007861982152359788
+
+     The expectation value for a particular pair of eigenstates and
+     evaluated in an interval of control parameter values can also be
+     computed using the option `-s'.  For example, to compute the
+     transition intensity between the ground state (zero angular momentum)
+     and the second eigenstate with angular momentum l=1, with N = 10, and
+     0.2 < xi < 0.4 Hamiltonian with a step of 0.05 in the control
+     parameter
+
+          triat_U3_2.2.1/examples/Observables$ ../../bin/intensity_IR \
+          > -s 10 0 1 1 2 1.0 0.2 0.5 0.05
+          
+           0.2      1.03195951590279317806E-0002
+           0.25      4.88985645132075223243E-0002
+           0.3      0.10416957597335169859
+           0.35      0.11597972613072936657
+           0.4      9.46745961688594321492E-0002
+           0.45      6.89270459035718042020E-0002
+           0.5      4.81758165286241743362E-0002
+
+     Finally, the last option is to compute the expectation value for two
+     eigenstates varying the system's size, for different N values, using
+     the option `-n'.  For example, to compute the transition intensity
+     between the ground state (zero angular momentum) and the second
+     eigenstate with angular momentum l=1 in the critical value of the
+     control parameter (xi = 0.2) with N taking values between 10 and 110
+     with a step of 20 bosons
+
+          triat_U3_2.2.1/examples/Observables$ ../../bin/intensity_IR \
+          > -n 10 110 20 0 1 1 2 1.0 0.2
+           10      1.03195951590279317806E-0002
+           30      1.76649230478514733430E-0002
+           50      2.11485562246530897512E-0002
+           70      2.35353506851742359296E-0002
+           90      2.53900792349369549193E-0002
+           110      2.69266373464041480800E-0002
+
+[1]  The transition operator is defined as T = D+/sqrt(N) + D-/sqrt(N).
+
+[2]  This makes reference to the model Hamiltonian H = scale[(1-xi) n +
+     xi/(N-1) P].
+
+3.4.3. Model and General Hamiltonian Eigenvalues
+------------------------------------------------
+
+     The `Perl' script `alg_U3_energy' computes the Hamiltonian eigenvalues
+     for the model and the general algebraic Hamiltonian.  [1].  A basic
+     help can be obtained running the script with the `-h' option.
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/alg_U3_energy -h
+
+Perl script to calculate the either the ground state energy or
+the full spectrum of a U(3) model or general Hamiltonian.
+
+In the model Hamiltonian case, the calculation can be limited to only a subset
+of the eigenvalues (first nstates), and a program taking advantage of the
+tridiagonal character of the matrix is provided (and default for N > 5000).
+
+The output can be adapted to the drawing of Birge-Sponer plots.
+
+     by Currix TM
+
+Usage: alg_U3_energy [-STvbB] Nval lval scale xi
+       alg_U3_energy [-STvbB] [-I nstates] Nval lval scale xi
+       alg_U3_energy [-STvG] Nval lval scale xi
+       alg_U3_energy [-SvbB] [-n] -g inputfile
+       alg_U3_energy -h
+
+
+  Options:
+    b : Birge Sponer plot output.
+    B : Birge Sponer plot output with energy dependence.
+    v : verbose output.
+    I : compute the energies for the first nstates (nstates > 2)
+    T : use the program version with tridiagonal matrix diagonalization
+    G : compute only the ground state energy
+    g : general Hamiltonian (supply name of the parameter file).
+    S : execute the statically linked program.
+    n : normalize energies or quantum number by N in the general Hamiltonian case.
+    h : help message.
+
+     For example, to compute the energy spectrum for the first three
+     excited states with angular momentum `l = 2', `N = 1000', and scale
+     and control parameter equal to 1.0 and 0.555, respectively.
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/alg_U3_energy -I 4 1000 2 1.0 0.555
+ 0       200.08946405931044
+ 1       202.26535936605771
+ 2       204.43652907169133
+ 3       206.60297075985744
+
+     To compute the ground state energy for `N = 10000', `l = 0', and scale
+     and control parameter equal to 1.0 and 0.75, respectively.
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/alg_U3_energy -G 10000 0 1.0 0.75
+ 0       1197.8541544435745
+
+     Finally, to compute the full energy spectrum for `l = 2', `N = 1000',
+     and scale and control parameter equal to 1.0 and 0.555
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/alg_U3_energy -I 1 1000 2 1.0 0.555
+ 0       200.08946405931044
+ 1       202.26535936605774
+ 2       204.43652907169133
+ 3       206.60297075985744
+ 4       208.76468198691873
+ 5       210.92166028156083
+ ....
+
+
+ 495       992.09574571198141
+ 496       994.26349601727406
+ 497       996.43459207588285
+ 498       998.60902996360642
+ 499       1000.7868057766277
+
+     When the general Hamiltonian spectrum is computed it is necessary to
+     provide the program with an input file, as the provided example input
+     file `input_file_HCP'
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/alg_U3_energy -g input_file_HCP
+ 0       0.0000000000000000
+ 1       566.85562373229914
+ 2       1028.5555120308779
+ 3       1484.2632344381639
+ 4       2046.9932672140753
+ 5       2689.7360152596357
+ 6       3382.0393187789541
+ 7       4103.8525588498442
+ 8       4838.4084093582642
+ 9       5569.7433116564898
+ 10       6281.1719539978449
+ 11       6953.5491948507442
+ 12       7562.3703503418556
+ 13       8078.6701738697193
+ 14       8529.0156142688975
+
+[1]  This makes reference to the model Hamiltonian H = scale[(1-xi) n +
+     xi/(N-1) P].
+
+3.4.4. Excitation Energy Diagrams
+---------------------------------
+
+     The `Perl' script `exc_energ_diag_U3_mh' computes the excitation
+     energies necessary to plot correlation energy diagrams for given
+     control parameter values with different options[1].  A basic help can
+     be obtained running the script with the `-h' option.
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/exc_energ_diag_U3_mh -h
+	Perl script to calculate the u first eigenvalues (g.s. -> u = 1) of
+the algebraic U(3) model Hamiltonian in a given xi value interval.
+If  u = 0 all anergies are included.
+
+	The energy values are normalized by the number of bosons N (E/N).
+
+ by Currix TM
+
+Usage: exc_energ_diag_U3_mh [-vhS] [-e progpath] Nval lval scale u ximin ximax xistep
+
+
+  Options:
+    S : execute statically linked Fortran program
+    v : verbose output
+    h : help message
+    e : provide the executable triat files
+
+     For example, to compute the excitation energy for the first three
+     excited states with zero angular momentum, with N = 10, and in the
+     interval of xi starting at 0.1 and ending at 0.4 with a step of 0.05
+     we execute
+
+triat_U3_2.2.1/examples/Observables$ ../../bin/exc_energ_diag_U3_mh \
+10 0 1.0 4 0.1 0.4 0.05
+
+0.1 0.0969591084744126 0.24303900731891 0.410527294642692 0.595860630601058
+0.15 0.141605046653722 0.261843236909951 0.416273614122525 0.596349388138778
+0.2 0.180891112017846 0.279990992516115 0.423496605540945 0.599080754985964
+0.25 0.210586829109494 0.300331396846074 0.433272340537003 0.604387056209837
+0.3 0.226957621450917 0.325171141950419 0.446759291603703 0.612551514295007
+0.35 0.2312738839248 0.351753480722973 0.465174292657181 0.623837735817851
+0.4 0.227411444586968 0.375148937971884 0.489249830006017 0.63853518398931
+
+[1]  This makes reference to the model Hamiltonian H = scale[(1-xi) n +
+     xi/(N-1) P].
+
+
+-------------------------------------------------------------------------------
+
+
+4. References
+-------------
+
+     1.   Minuit minimization package (http://www.cern.ch/minuit): Comput.
+          Phys.  Commun.  _10_ (1975) 343-367.
+
+     2.   J.  Chem.  Phys.  _104_ (1996) 6956.
+
+     3.   Chem.  Phys.  Lett.  _365_ (2002) 57-68.
+
+     4.   Chem.  Phys.  Lett.  _375_ (2003) 309-320.
+
+     5.   Phys.  Rev.  _A77_ (2008) 032115.
+
+
+-------------------------------------------------------------------------------
+
+
+     `tise_1D_pseudo' User's Guide
+
+     Curro Perez-Bernal <francisco.perez@dfaie.uhu.es>
+     Laura Moschini <laura.moschini@pd.infn.it>
+
+
+     Version 1
+
