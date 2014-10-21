@@ -1,4 +1,5 @@
 BINPATH = ../bin/
+BINPATHINSTALL = /usr/local/bin
 #
 #     HO
 1body_1D_HO_wsaxon_SRC = nrtype.f90 constants.f90 pot_param.f90	egs_mod_ho.f90 \
@@ -170,8 +171,16 @@ morse_ISQW_1body_1D_static: $(1body_1D_ISQW_morse_OBJ)
 	$(FC) -static -o $(BINPATH)/morse_1body_1D_ISQW  $(1body_1D_ISQW_morse_OBJ) $(LIBS) 
 #######################
 #######################
-clean:
-	@rm -f $(1body_1D_HO_wsaxon_OBJ)  $(1body_1D_HO_ht_OBJ) $(1body_1D_THO_wsaxon_OBJ) $(1body_1D_ISQW_wsaxon_OBJ) $(1body_1D_ISQW_pt_OBJ) $(1body_1D_HO_morse_OBJ)
+install:
+	@cp $(BINPATH)/dBde_script $(BINPATH)/program_launcher_1body_N $(BINPATH)/morse_1body_1D_HO $(BINPATH)/pteller_1body_1D_HO $(BINPATH)/ht_1body_1D_HO $(BINPATH)/wsaxon_1body_1D_HO $(BINPATH)/wsaxon_1body_1D_THO $(BINPATH)/wsaxon_1body_1D_ISQW $(BINPATH)/ht_1body_1D_ISQW $(BINPATH)/pteller_1body_1D_ISQW $(BINPATH)/morse_1body_1D_ISQW $(BINPATH)/pteller_1body_1D_THO $(BINPATHINSTALL)
+#######################
+#######################
+uninstall:
+# 	@rm $(BINPATHINSTALL)/dBde_script $(BINPATHINSTALL)/program_launcher_1body_N $(BINPATHINSTALL)/morse_1body_1D_HO $(BINPATHINSTALL)/pteller_1body_1D_HO $(BINPATHINSTALL)/ht_1body_1D_HO $(BINPATHINSTALL)/wsaxon_1body_1D_HO $(BINPATHINSTALL)/wsaxon_1body_1D_THO $(BINPATHINSTALL)/wsaxon_1body_1D_ISQW $(BINPATHINSTALL)/ht_1body_1D_ISQW $(BINPATHINSTALL)/pteller_1body_1D_ISQW $(BINPATHINSTALL)/morse_1body_1D_ISQW $(BINPATHINSTALL)/pteller_1body_1D_THO 
+# #######################
+# #######################
+# clean:
+# 	@rm -f $(1body_1D_HO_wsaxon_OBJ)  $(1body_1D_HO_ht_OBJ) $(1body_1D_THO_wsaxon_OBJ) $(1body_1D_ISQW_wsaxon_OBJ) $(1body_1D_ISQW_pt_OBJ) $(1body_1D_HO_morse_OBJ) *.mod
 
 
 
