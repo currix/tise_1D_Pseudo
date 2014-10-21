@@ -31,7 +31,7 @@ SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, iprint)
   Ews_total = 0.0_DP
   !
   DO KI = 1, ndim
-     x2_gstate = avec_X(:,1)*X_Grid(:)*avec_X(:,KI)
+     x2_gstate = avec_X(:,1)*X_Grid(:)*avec_X(:,KI) ! Check why x2_gstate
      Ifail = 0
      !
      Ews_temp = 0.0_DP
