@@ -85,10 +85,11 @@ SUBROUTINE E1_HO(Iprint, I_toten, apar)
      PRINT*, "Analytical method"
      !
      !
-     WRITE(filename_E1, '(A, "_",A,"_N",I2,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      IF ( dim_HO < 10) THEN !to avoid spaces
-        WRITE(filename_E1, '(A, "_",A,"_N",I1,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
-     ELSE IF ( dim_HO > 99) THEN 
+        WRITE(filename_E1, '(A, "_",A,"_N",I1,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+     ELSE IF ( dim_HO < 100) THEN !to avoid spaces
+        WRITE(filename_E1, '(A, "_",A,"_N",I2,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+     ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
         WRITE(filename_E1, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      ENDIF
      !
@@ -113,11 +114,12 @@ SUBROUTINE E1_HO(Iprint, I_toten, apar)
      !
   ENDDO
   !
-  WRITE(filename_TM, '(A, "_",A,"_TM_N",I2,".dat")') TRIM(prog), TRIM(file), dim_HO
   IF ( dim_HO < 10) THEN !to avoid spaces
-     WRITE(filename_TM, '(A, "_",A,"_TM_N",I1,".dat")') TRIM(prog), TRIM(file), dim_HO
-  ELSE IF ( dim_HO > 99) THEN 
-     WRITE(filename_TM, '(A, "_",A,"_TM_N",I3,".dat")') TRIM(prog), TRIM(file), dim_HO
+     WRITE(filename_TM, '(A, "_",A,"_TM_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
+  ELSE IF ( dim_HO < 100) THEN !to avoid spaces
+     WRITE(filename_TM, '(A, "_",A,"_TM_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
+  ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
+     WRITE(filename_TM, '(A, "_",A,"_TM_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
   ENDIF
   !
   OPEN(UNIT = 76, FILE = filename_TM, STATUS = "UNKNOWN", ACTION = "WRITE")

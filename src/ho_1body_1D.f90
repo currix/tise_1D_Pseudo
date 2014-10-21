@@ -472,13 +472,13 @@ PROGRAM HO_1BODY_1D
   ! SAVING HARMONIC BASIS
   IF (isave_BAS == 1) THEN
      file = 'basis'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
      IF ( dim_HO > 99) THEN 
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
+     !
      OPEN(UNIT = 70, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(70,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
      WRITE(70,*) "#Grid    Harmonic basis"
@@ -491,13 +491,13 @@ PROGRAM HO_1BODY_1D
   ! SAVING EIGENVECTORS
   IF (isave_WF == 1) THEN
      file = 'eigenvectors'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
      IF ( dim_HO > 99) THEN 
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
+     !
      OPEN(UNIT = 71, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(71,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
      WRITE(71,*) "#Grid     Eigenvectors"
@@ -510,13 +510,14 @@ PROGRAM HO_1BODY_1D
   ! SAVING EIGENVECTOR DERIVATIVES
   IF (isave_WF == 1) THEN
      file = 'eigvec_der'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
-     IF ( dim_HO > 99) THEN 
+     ELSE IF ( dim_HO < 100) THEN !to avoid spaces
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
+     ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
+     !
      OPEN(UNIT = 72, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(72,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
      WRITE(72,*) "#Grid    Eigenvector derivatives"
@@ -530,10 +531,14 @@ PROGRAM HO_1BODY_1D
   ! SAVING ENERGIES
   IF (isave_EN == 1) THEN
      file = 'eigenvalues'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
+     ELSE IF ( dim_HO < 100) THEN !to avoid spaces
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
+     ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
+        WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
+     !
      OPEN(UNIT = 73, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(73,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
      WRITE(73,*) "# Eigenvalues"
@@ -543,11 +548,11 @@ PROGRAM HO_1BODY_1D
      CLOSE(UNIT = 73)
      !
      file = 'pot_eigvec'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
-     IF ( dim_HO > 99) THEN 
+     ELSE IF ( dim_HO < 100) THEN !to avoid spaces
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
+     ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
      OPEN(UNIT = 74, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
@@ -555,11 +560,11 @@ PROGRAM HO_1BODY_1D
      WRITE(74,*) "#Grid    Potential    10*Eigenfunctions+eigenvalue"
      !
      file = 'pot_eigvec2'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
-     IF ( dim_HO > 99) THEN 
+     ELSE IF ( dim_HO < 100) THEN !to avoid spaces
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
+     ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
      OPEN(UNIT = 75, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
