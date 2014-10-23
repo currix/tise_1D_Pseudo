@@ -273,59 +273,6 @@ x  Potential(x) 10xEigvec_1(x)+Eigval(1) 10xEigvec_2(x)+Eigval(2) .... 10xEigvec
      15.  `IPRINT': _integer_ type.  Program output verbosity.  Mainly for
           debugging purposes.  Possible values in the interval 0-5.
 
-     The information provided to `Minuit' for the algebraic spectroscopic
-     parameter optimization is given in a file.  The structure of this file
-     is a three column list including the parameter labels, its initial
-     values and initial minimization steps for the fourteen possible
-     Hamiltonian parameters.  This is followed by a statement using the
-     `Minuit' command `fix' to indicate what parameter should be kept
-     constant at the initial value.  The file ends with the `Minuit'
-     commands for the optimization.  More information can be found in the
-     Fortran Minuit Manual
-     (http://wwwasdoc.web.cern.ch/wwwasdoc/minuit/minmain.html) and in the
-     `Minuit' homepage (See Chapter 4, `References').
-
-          SET TITLE
-          'MINUIT MINIMIZATION. BENDING DYNAMICS'
-          PARAMETERS
-          1     'P11 '  6.129D+02         0.1D-02
-          2     'P21 '  9.9D+00           0.1D-02
-          3     'P22 '  0.30D+00          0.1D-02
-          4     'P23 '  -1.03D+00         0.1D-02
-          5     'P31 '  0.0D+00           0.0D+00
-          6     'P32 '  0.0D+00           0.0D+00
-          7     'P33 '  0.0D+00           0.0D+00
-          8     'P41 '  0.0D+00           0.0D+00
-          9     'P42 '  0.0D+00           0.0D+00
-          10    'P43 '  0.0D+00           0.0D+00
-          11    'P44 '  0.0D+00           0.0D+00
-          12    'P45 '  0.0D+00           0.0D+00
-          13    'P46 '  0.0D+00           0.0D+00
-          14    'P47 '  0.0D+00           0.0D+00
-          
-          fix  5 7 8 9 10 11 12 13 14
-          #set err 1.0D-05
-          minimize 3000
-          call 3
-          exit
-
-     The parameters have labels `P'<nm>, where <n> = 1,2,3,4 indicates that
-     the operator is <n>-th body, and <m> is an index to distinguish
-     between the different operators of the same order.  From the
-     Hamiltonian building subroutine `hbldu3_gen.f':
-
-            H = P11 n +
-                P21 n^2 + P22 l^2 + P23 W^2 +
-                P31 n^3 + P32 n·l^2 + P33 (n·W^2 + W^2·n) +
-                P41 n^4 + P42 n^2·l^2 + P43 l^4 + P44 l^2·W^2 +
-                P45 (n^2·W^2 + W^2·n^2) + P46 W^4 +
-                P47 (W^2·Wbar^2 + Wbar^2·W^2)/2
-
-     where `n' is the U(2) number operator, `l' is the vibrational angular
-     momentum, `W^2' is the second order Casimir operator associated so
-     SO(3), and `Wbar^2' is the Casimir operator of the SObar(3)
-     subalgebra.
-
 [1]  See A.  U.  Hazi and H.  S.  Taylor.  Phys.  Rev.  A, _1_:1109–1120,
      1970.
 

@@ -2,11 +2,11 @@ Fortran 90 code to compute eigenvalues and eigenvectors of a
 1D potential solving the time independent Schroedinger equation 
 using a pseudostate approximation. Three different bases:
 
-Harmonic Oscillator
+(1) Harmonic Oscillator
 
-Transformed Harmonic Oscillator
+(2) Transformed Harmonic Oscillator
 
-Box
+(3) Box
 
 
 Makes use of lapack95, minpack, and intlib libraries.
