@@ -1,12 +1,12 @@
 #
 #       INPUT FILE FOR INFSQ_1BODY_1D
 #       
-&INP_AUX   Igs = 0, IsaveEN = 1, IsaveWF = 0, IsaveBAS = 0, I_sumr = 0, Iprint = 1 /
+&INP_AUX   Igs = 0, IsaveEN = 1, IsaveWF = 0, IsaveBAS = 0, I_sumr = 0, I_toten = 1, Iprint = 4 /
 #
-&INP_X     X_min = -15.0, X_max = 15.0 /
-&INP_DIM   dim_X = 501, dim_BOX = 30 /
-&INP_MASS  Iad=0, reduced_mass = 0.975 /
-&INP_POT   param_pot = -12.0, 5.0, 0.8, 0.0, 0.0 /
+&INP_X     X_min = -40.0, X_max = 40.0 /
+&INP_DIM   dim_X = 901, dim_BOX = 100 /
+&INP_MASS  Iad=0, reduced_mass = 0.952 /
+&INP_POT   param_pot = -45.0, 3.4, 0.5, 0.0, 0.0 /
 &INP_SHIFT Iphase = 0, lambda = 0.225 /
 #
 

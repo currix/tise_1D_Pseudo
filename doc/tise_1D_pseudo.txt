@@ -80,7 +80,7 @@ Contents
 
           wget https://github.com/currix/tise_1D_Pseudo/archive/master.zip
 
-     The files should be unpacked followed by the usual compilation steps
+     The files should be unpacked and the usual compilation steps follow
 
 $ unzip master.zip
 Archive:  master.zip
@@ -447,14 +447,40 @@ x  Potential(x) 10xEigvec_1(x)+Eigval(1) 10xEigvec_2(x)+Eigval(2) .... 10xEigvec
      of the HO basis states.  This should be checked whenever the basis
      dimension or the spatial grid parameter change.
 
-     The output proceeds with the system energies (negative for the bound
-     states) and positive for the discretized pseudostate continuum.
+     The output proceeds with the system energies, with negative values for
+     the bound states and positive values for the discretized pseudostate
+     continuum.
 
      The program then computes the B1 and B2 values for the three bound
      states as `I_toten = 3'.  In each case two solutions (for debugging
      purposes) are given that should be equal; one computed with the
      numerical integral (called `Numerical method') and the other
      algebraically using the HO properties (calle `Analytical method').
+
+     The following files are saved, note that the `N250' part of the name
+     varies with the `N' value and that in this case there are three bound
+     states and we are asking for `B1' and `B2' results for the three
+     eigenstates.
+
+     1.   `ho_eigenvalues_N250.dat': system eigenvalues.
+
+     2.   `ho_pot_eigvec_N250.dat': eigenfunctions plus the energy as a
+          function of `x'.
+
+     3.   `ho_pot_eigvec2_N250.dat': squared eigenfunctions plus the energy
+          as a function of `x'.
+
+     4.   `ho_E1_N250_i.dat', `i = 1, 2, 3': Two columns, `E_k
+          |<i|x|k;>|^2' for `k = 1, ..., dim'
+
+     5.   `ho_E1_TM_N250.dat': Three columns, `E_k <1|x|k> <2|x|k>|
+          <3|x|k>' for `k = 1, ..., dim'
+
+     6.   `ho_E2_N250_i.dat', `i = 1, 2, 3': Two columns, `E_k
+          |<i|x^2|k>|^2' for `k = 1, ..., dim'
+
+     7.   `ho_E2_TM_N250.dat': Three columns, `E_k <1|x^2|k> <2|x^2|k>|
+          <3|x^2|k>' for `k = 1, ..., dim'
 
 
 -------------------------------------------------------------------------------
