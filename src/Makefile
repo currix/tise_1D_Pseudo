@@ -179,8 +179,8 @@ uninstall:
 # 	@rm $(BINPATHINSTALL)/dBde_script $(BINPATHINSTALL)/program_launcher_1body_N $(BINPATHINSTALL)/morse_1body_1D_HO $(BINPATHINSTALL)/pteller_1body_1D_HO $(BINPATHINSTALL)/ht_1body_1D_HO $(BINPATHINSTALL)/wsaxon_1body_1D_HO $(BINPATHINSTALL)/wsaxon_1body_1D_THO $(BINPATHINSTALL)/wsaxon_1body_1D_ISQW $(BINPATHINSTALL)/ht_1body_1D_ISQW $(BINPATHINSTALL)/pteller_1body_1D_ISQW $(BINPATHINSTALL)/morse_1body_1D_ISQW $(BINPATHINSTALL)/pteller_1body_1D_THO 
 # #######################
 # #######################
-# clean:
-# 	@rm -f $(1body_1D_HO_wsaxon_OBJ)  $(1body_1D_HO_ht_OBJ) $(1body_1D_THO_wsaxon_OBJ) $(1body_1D_ISQW_wsaxon_OBJ) $(1body_1D_ISQW_pt_OBJ) $(1body_1D_HO_morse_OBJ) *.mod
+clean:
+	@rm -f $(1body_1D_HO_wsaxon_OBJ)  $(1body_1D_HO_ht_OBJ) $(1body_1D_THO_wsaxon_OBJ) $(1body_1D_ISQW_wsaxon_OBJ) $(1body_1D_ISQW_pt_OBJ) $(1body_1D_HO_morse_OBJ) *.mod
 
 
 
