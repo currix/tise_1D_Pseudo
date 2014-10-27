@@ -1,10 +1,11 @@
 #
-#       INPUT FILE FOR HO_1BODY_1D wsaxon pot
+#       INPUT FILE FO HO_1BODY_1DR 
 #
-&INP_X     X_MIN = -90.0, X_MAX = 90.0 /
-&INP_DIM   DIM_X = 901, DIM_HO = 200 /
-&INP_MASS  IAD = 0, REDUCED_MASS = 0.952 /
-&INP_POT   PARAM_POT = -45.0, 3.4, 0.5, 0.0, 0.0  /
+&INP_X     X_MIN = -130.0, X_MAX = 130.0 /
+&INP_DIM   DIM_X = 1501, DIM_HO = 250 /
+&INP_MASS  IAD = 4, REDUCED_MASS = 0.975 /
+&INP_POT   PARAM_POT = -50.0, 2.0, 0.4, 0.0, 0.0  /
 &INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
 #
-&INP_AUX   I_GS = 0, I_SUMR = 0, I_toten =1, ISAVE_EN = 0, ISAVE_WF = 0, ISAVE_BAS = 0, IPRINT = 1, isave_BAS_POT = 0 /
+&INP_AUX   I_gs = 0, Isave_EN = 1, Isave_WF = 0, Isave_BAS = 0, I_sumr = 0, I_toten = 3, Iprint = 2 /
+
