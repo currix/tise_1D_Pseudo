@@ -1,10 +1,10 @@
 #
-#       INPUT FILE FOR THO_1BODY_1D
+#       INPUT FILE FOR THO_1BODY_1D wsaxon
 #
-&INP_X     X_MIN = -55.0, X_MAX = 55.0, ratio = 1.2 /
-&INP_DIM   DIM_X = 601, DIM_THO = 20 /
-&INP_MASS iad = 0, REDUCED_MASS = 0.975 /
-&INP_POT   PARAM_POT = -12.0, 5.0, 0.8, 0.0, 0.0 /
-&INP_SHIFT I_PHASE = 1, LAMBDA = 0.1 /
+&INP_X     X_MIN = -110.0, X_MAX = 110.0, ratio = 1.2 /
+&INP_DIM   DIM_X = 1001, DIM_THO = 65	 /
+&INP_MASS iad = 0, REDUCED_MASS = 0.952 /
+&INP_POT   PARAM_POT = -45.0, 3.40, 0.5, 0.0, 0.0 /
+&INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
 #
-&INP_AUX   I_gs = 0, I_saveEN = 0, I_saveWF = 0, I_saveBAS = 0, I_sumr = 0, I_toten = 0, Iprint = 3 /
+&INP_AUX   I_GS = 0, I_SUMR = 0, I_toten = 1, ISAVE_EN = 0, ISAVE_WF = 1, ISAVE_BAS = 0, Iprint = 2 /

@@ -1,9 +1,9 @@
 #
-#       Input FILE FOR INFSQ_1BODY_1D ------ pteller potential
+#       INPUT FILE FOR INFSQ_1BODY_1D ------ pteller potential
 #
-&INP_AUX   iGS = 0, I_SUMR = 1, I_toten = 0, ISAVEEN = 0, ISAVEWF = 0, ISAVEBAS = 0, Iprint = 3 /
-&INP_X     X_MIN = -8.0, X_MAX = 8.0 /
-&INP_DIM   DIM_X = 701, DIM_BOX = 60 /
+&INP_AUX   iGS = 0, I_SUMR = 1, I_toten = 0, ISAVEEN = 1, ISAVEWF = 1, ISAVEBAS = 1, Iprint = 3 /
+&INP_X     X_MIN = -15.0, X_MAX = 15.0 /
+&INP_DIM   DIM_X = 501, DIM_BOX = 26 /
 &INP_MASS iad = 1, REDUCED_MASS = 1.0 /
 &INP_POT   PARAM_POT = -1.0, 1.0, 0.0, 0.0, 0.0 /
 &INP_SHIFT IPHASE = 0, LAMBDA = 0.1 /

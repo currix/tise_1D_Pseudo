@@ -1,7 +1,7 @@
 PROGRAM SQBOX1Df90
   !
   !
-  !     $Id: infsq_box_1D.f90,v 1.5 2013/06/13 12:28:16 curro Exp $
+  !     $Id: infsq_box_1D.f90,v 1.6 2013/05/14 17:57:17 laura Exp laura $
   !
   !
   !     PROGRAM THAT SOLVES NUMERICALLY THE 1D SCHROEDINGER EQUATION 
@@ -129,46 +129,34 @@ PROGRAM SQBOX1Df90
   END INTERFACE Phase_Shift_HT
   !
   INTERFACE E1
-     !
-     SUBROUTINE E1(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE E1(Iprint)
        !
        USE constants
        USE nrtype
+       USE egs_mod_isqw
        !
        IMPLICIT NONE
        !
-       ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
-       !
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint
      END SUBROUTINE E1
-     !
   END INTERFACE E1
   !
   INTERFACE E2
-     !
-     SUBROUTINE E2(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE E2(Iprint)
        !
        USE constants
        USE nrtype
+       USE egs_mod_isqw
        !
        IMPLICIT NONE
        !
-       ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
-       !
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint
      END SUBROUTINE E2
-     !
   END INTERFACE E2
   !
   INTERFACE Total_Strength
      !
-     SUBROUTINE Total_Strength(nstates, ndim, dim_X, X_grid, avec_X, iprint)
+     SUBROUTINE Total_Strength(ndim, dim_X, X_grid, avec_X, Aval, iprint)
        !
        USE nrtype
        USE constants
@@ -177,10 +165,9 @@ PROGRAM SQBOX1Df90
        !
        !
        ! ARGUMENTS
-       INTEGER(KIND = I4B), INTENT(IN) :: nstates, ndim, dim_X, Iprint
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid
+       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, Iprint
+       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, Aval
        REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
-       !
        !
      END SUBROUTINE Total_Strength
      !
@@ -188,7 +175,7 @@ PROGRAM SQBOX1Df90
   !
   INTERFACE Ew_Strength
      !
-     SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, nstates)
+     SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, iprint)
        !
        USE nrtype
        USE constants
@@ -196,7 +183,7 @@ PROGRAM SQBOX1Df90
        IMPLICIT NONE
        !
        ! ARGUMENTS
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
+       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, Iprint
        REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
        REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
        !
@@ -240,7 +227,7 @@ PROGRAM SQBOX1Df90
   !     PROGRAM VERSION
   IF (Iprint>1) &
        WRITE(*,*) &
-       '$Id: infsq_box_1D.f90,v 1.5 2013/06/13 12:28:16 curro Exp $'         
+       '$Id: infsq_box_1D.f90,v 1.6 2013/05/14 17:57:17 laura Exp laura $'         
   !
   prog = 'isqw' !to set output file's names
   !
@@ -429,25 +416,26 @@ PROGRAM SQBOX1Df90
   ENDIF
   !
 10 FORMAT (1X,I6,1X,E16.8)
-11 FORMAT (1X,E14.6,1X,300E17.8E3)
+11 FORMAT (1X,E14.6,1X,300E16.8)
   !
   !
-  IF (i_SUMR /= 0) THEN
+  IF (i_SUMR == 1) THEN
      ! COMPUTE TOTAL SUM RULE STRENGTH
-     !CALL TOTAL_STRENGTH(i_SUMR, dim_BOX, dim_X, X_grid, Avec_Box_X, Iprint)
+     CALL TOTAL_STRENGTH(dim_BOX, dim_X, X_grid, Avec_Box_X, Aval_Box, Iprint)
      ! COMPUTE ENERGY WEIGHTED SUM RULE STRENGTH
-     CALL EW_STRENGTH(dim_BOX, dim_X, X_grid, Aval_Box, Avec_Box_X, I_sumr)
+     CALL EW_STRENGTH(dim_BOX, dim_X, X_grid, Aval_Box, Avec_Box_X, Iprint)
   ENDIF
   !
   !
-  ! CALCULATING E1 and E2
-  IF(I_toten /= 0) THEN
+  IF(I_toten == 1) THEN
+     ! E1 CALCULATION 
+     CALL E1(Iprint)
      !
-     CALL E1(dim_BOX, dim_X, X_max, X_grid, Aval_Box, Avec_Box_X, I_toten)
-     !
-     !
-     CALL E2(dim_BOX, dim_X, X_max, X_grid, Aval_Box, Avec_Box_X, I_toten)
+     ! E2 CALCULATION 
+     CALL E2(Iprint)
   ENDIF
+  !
+  !
   !
   ! PHASE SHIFT CALCULATION
   IF (Iphase == 1) THEN

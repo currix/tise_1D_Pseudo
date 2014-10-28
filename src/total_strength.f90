@@ -52,7 +52,7 @@ SUBROUTINE Total_Strength(nstates, ndim, dim_X, X_grid, avec_X, iprint)
   DO istate = 1, nstates
      !
      Total_Str = 0.0_DP
-     DO ki = 1, ndim
+     DO ki = 1, ndim !PARAMETRO DA CAMBIARE, AL MAX NDIM
         !
         x2_vec = avec_X(:,istate)*X_Grid(:)*avec_X(:,ki)
         !

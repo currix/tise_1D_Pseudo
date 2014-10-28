@@ -3,7 +3,7 @@ SUBROUTINE Phase_shift_HT(dim_X, X_grid, avec_X, lambda, Index, ee, ek, eta_1, e
   !     EQ(13) Hazi & Taylor PRA 1 ( 1970) 1109
   !
   !
-  ! $Id: phase_shift_HT.f90,v 1.3 2013/05/05 22:27:25 curro Exp $
+  ! $Id: phase_shift_HT.f90,v 1.3 2013/05/05 22:27:25 curro Exp laura $
   !
   ! by Currix TM.
   !
@@ -110,7 +110,7 @@ SUBROUTINE Phase_shift_HT(dim_X, X_grid, avec_X, lambda, Index, ee, ek, eta_1, e
   Ifail = 0
   CALL D01GAF(X_Grid(dim_X/2+1), aux(dim_X/2+1), dim_X/2, ainteg2, error, Ifail)
   !
-  eta_1 = ATAN(-ainteg1/ainteg2)
+  eta_1 = (-ainteg1/ainteg2)
   !     -INFINITY TO ZERO
   !     NUMERATOR
   DO I = 1, dim_X/2 + 1
@@ -140,7 +140,7 @@ SUBROUTINE Phase_shift_HT(dim_X, X_grid, avec_X, lambda, Index, ee, ek, eta_1, e
   Ifail = 0
   CALL D01GAF(X_Grid, aux, dim_X/2 + 1, ainteg2, error, Ifail)
   !
-  eta_2 = ATAN(ainteg1/ainteg2)
+  eta_2 = (ainteg1/ainteg2)
   !
   DEALLOCATE(aux, STAT = IERR)    
   IF (IERR /= 0) THEN

@@ -1,10 +1,10 @@
 #
 #       INPUT FILE FOR HO_1BODY_1D ------ pteller potential
 #
-&INP_X     X_MIN = -35.0, X_MAX = 35.0 /
-&INP_DIM   DIM_X = 1001, DIM_HO = 100 /
-&INP_MASS iad = 0, REDUCED_MASS = 0.947 /
-&INP_POT   PARAM_POT =-50.0, 0.50, 0.0, 0.0, 0.0 /
+&INP_X     X_MIN = -25.0, X_MAX = 25.0 /
+&INP_DIM   DIM_X = 601, DIM_HO = 15 /
+&INP_MASS iad = 1, REDUCED_MASS = 1.0 /
+&INP_POT   PARAM_POT = -2.0, 1.0, 0.0, 0.0, 0.0 /
 &INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
 #
 &INP_AUX   i_GS = 0, I_SUMR = 1, I_toten = 0,  ISAVE_EN = 1, ISAVE_WF = 1, ISAVE_BAS = 1, Iprint = 3 /

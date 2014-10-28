@@ -7,4 +7,4 @@
 &INP_MASS iad = 0, REDUCED_MASS = 0.947 /
 &INP_POT   PARAM_POT = 57.25, 0.477860, 0.0, 0.0, 0.0 /
 &INP_SHIFT IPHASE = 0, LAMBDA = 0.1 /
-#
+# 

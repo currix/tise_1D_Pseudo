@@ -22,5 +22,7 @@ MODULE egs_ho_f
   ! EIGENVECTOR DERIVATIVES
   REAL(KIND = DP), DIMENSION(:,:), ALLOCATABLE :: Avec_Har_Der_X
   !
+  ! Last bound state (for optimization of the oscillator length)
+  INTEGER(KIND = I4B) :: last_bound_state
   !
 END MODULE egs_ho_f

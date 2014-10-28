@@ -1,0 +1,10 @@
+#
+#       INPUT FILE FOR THO_1BODY_1D ginocchio pot
+#
+&INP_X     X_MIN = -50.0, X_MAX = 50.0, ratio = 2.6 /
+&INP_DIM   DIM_X = 601, DIM_THO = 20 /
+&INP_MASS  IAD = 1, REDUCED_MASS = 1.0 /
+&INP_POT   PARAM_POT = 0.62, 2, 1, 0.0, 0.0  /
+&INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
+#
+&INP_AUX   I_GS = 0, I_SUMR = 0, I_toten = 0, ISAVE_EN = 1, ISAVE_WF = 1, ISAVE_BAS = 1, IPRINT = 2 /
