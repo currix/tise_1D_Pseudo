@@ -44,7 +44,7 @@ e1_ho.f90 e2_ho.f90 phase_shift_HT.f90 phase_shift_CH.f90
 1body_1D_HO_morse_SRC = nrtype.f90 constants.f90 pot_param.f90 egs_mod_ho.f90 \
 ho_1body_1D.f90 build_HO_bas.f90 ham_mat_1D_1body_ho.f90 e_gstate_ho.f90 \
 morse_pot.f90 wfp_ho.f90 total_strength.f90 ew_sum_rule.f90 \
-e1.f90 e2.f90 phase_shift_HT.f90 phase_shift_CH.f90 
+e1_ho.f90 e2_ho.f90 phase_shift_HT.f90 phase_shift_CH.f90 
 #
 1body_1D_HO_morse_OBJ = $(1body_1D_HO_morse_SRC:.f90=.o)
 #
@@ -90,14 +90,14 @@ e1_tho.f90 e2_tho.f90 phase_shift_HT.f90
 1body_1D_THO_morse_SRC = nrtype.f90 constants.f90 pot_param.f90 egs_mod_tho.f90 lst_param.f90 \
 tho_1body_1D.f90 build_THO_bas.f90 ham_mat_1D_1body_tho.f90 e_gstate_tho.f90 \
 morse_pot.f90 wfp_tho.f90 total_strength.f90 ew_sum_rule.f90 \
-e1.f90 e2.f90 phase_shift_HT.f90
+e1_tho.f90 e2_tho.f90 phase_shift_HT.f90
 #
 1body_1D_THO_morse_OBJ = $(1body_1D_THO_morse_SRC:.f90=.o)
 #
 1body_1D_THO_ginocchio_SRC = nrtype.f90 constants.f90 pot_param.f90 egs_mod_tho.f90 lst_param.f90 \
 tho_1body_1D.f90 build_THO_bas.f90 ham_mat_1D_1body_tho.f90 e_gstate_tho.f90 \
 ginocchio_pot.f90 wfp_tho.f90 total_strength.f90 ew_sum_rule.f90 \
-e1.f90 e2.f90 phase_shift_HT.f90
+e1_tho.f90 e2_tho.f90 phase_shift_HT.f90
 #
 1body_1D_THO_ginocchio_OBJ = $(1body_1D_THO_ginocchio_SRC:.f90=.o)
 #
@@ -138,13 +138,11 @@ e1_isqw.f90 e2_isqw.f90 phase_shift_HT.f90
 #
 1body_1D_ISQW_ginocchio_OBJ = $(1body_1D_ISQW_ginocchio_SRC:.f90=.o)
 #
-#
 #      ANALYTICAL B1 AND B2 INTEGRATION
 #
 B1_B2_INTEGRAL_OBJ = $(B1_B2_INTEGRAL_SRC:.f90=.o)
 #
-B1_B2_INTEGRAL_SRC = nrtype.f90\
-analytical_B1_B2.f90\
+B1_B2_INTEGRAL_SRC = nrtype.f90 analytical_B1_B2.f90
 #
 B1_B2_INTEGRAL_OBJ = $(B1_B2_INTEGRAL_SRC:.f90=.o)
 #
@@ -165,8 +163,8 @@ NAGLIB = -L/usr/local/lib/NAG -lnag
 #
 LIBS     = $(NAGLIB) $(LAPACK95) $(LAPACK77) $(BLAS)
 
-all: HO THO ISQW ANALYTICAL_B1B2
-ll_static: HO_static THO_static ISQW_static
+all: HO THO ISQW B1_B2_INTEGRAL
+all_static: HO_static THO_static ISQW_static
 #
 HO: wsaxon_HO_1body_1D mexhat_HO_1body_1D barrierws_HO_1body_1D  ht_HO_1body_1D pteller_HO_1body_1D  morse_HO_1body_1D  ginocchio_HO_1body_1D
 HO_static: wsaxon_HO_1body_1D_static ht_HO_1body_1D_static pt_HO_1body_1D_static morse_HO_1body_1D_static
@@ -175,12 +173,11 @@ THO_static: wsaxon_THO_1body_1D_static pteller_THO_1body_1D_static
 ISQW: wsaxon_ISQW_1body_1D ht_ISQW_1body_1D pteller_ISQW_1body_1D morse_ISQW_1body_1D ginocchio_ISQW_1body_1D
 ISQW_static: wsaxon_ISQW_1body_1D_static ht_ISQW_1body_1D_static pteller_ISQW_1body_1D_static morse_ISQW_1body_1D_static
 #
-
-
-
+#
+############################
 .PHONY : all
 # 
-#
+###########################
 # Standard compilation rules
 #
 %.o: %.f90
@@ -192,7 +189,7 @@ ISQW_static: wsaxon_ISQW_1body_1D_static ht_ISQW_1body_1D_static pteller_ISQW_1b
 %.o: %.f
 	$(FC) $(FOPT) $<
 #
-#######################
+##########################
 wsaxon_HO_1body_1D: $(1body_1D_HO_wsaxon_OBJ)
 	$(FC) -o $(BINPATH)/wsaxon_1body_1D_HO  $(1body_1D_HO_wsaxon_OBJ) $(LIBS) 
 mexhat_HO_1body_1D: $(1body_1D_HO_mexhat_OBJ)

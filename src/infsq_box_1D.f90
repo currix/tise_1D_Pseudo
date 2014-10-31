@@ -1,9 +1,6 @@
 PROGRAM SQBOX1Df90
   !
   !
-  !     $Id: infsq_box_1D.f90,v 1.5 2013/06/13 12:28:16 curro Exp $
-  !
-  !
   !     PROGRAM THAT SOLVES NUMERICALLY THE 1D SCHROEDINGER EQUATION 
   !     USING AN INF SQUARE WELL BASIS FOR A GENERAL POTENTIAL.
   !
@@ -29,8 +26,9 @@ PROGRAM SQBOX1Df90
   !
   IMPLICIT NONE
   !
-  !     FLAGS FOR SAVING PHASE SHIFTS, BASIS AND EIGENVECTORS, sum rules, E1 and E2
+  !     FLAGS FOR SAVING PHASE SHIFTS, BASIS AND EIGENVECTORS, sum rules, B1 and B2
   INTEGER(KIND = I4B) :: Iphase, IsaveEN, IsaveBAS, IsaveWF, I_sumr, Igs, I_toten
+  LOGICAL :: B_analytical, B_numerical
   !    
   !     ADIMENSIONAL CASE
   INTEGER(KIND = I4B) :: Iad
@@ -128,43 +126,45 @@ PROGRAM SQBOX1Df90
      !
   END INTERFACE Phase_Shift_HT
   !
-  INTERFACE E1
+  INTERFACE B1_ISQW
      !
-     SUBROUTINE E1(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
+       !
+       ! < bound | X | AVEC(i) >
+       !
        !
        USE constants
        USE nrtype
+       USE egs_mod_isqw
        !
        IMPLICIT NONE
        !
-       ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint, I_toten
+       LOGICAL, INTENT(IN) :: B_numerical, B_analytical
        !
-     END SUBROUTINE E1
+     END SUBROUTINE B1_ISQW
      !
-  END INTERFACE E1
+  END INTERFACE B1_ISQW
   !
-  INTERFACE E2
+  INTERFACE B2_ISQW
      !
-     SUBROUTINE E2(ndim, dim_X, X_max, X_grid, aval, avec_X, nstates)
+     SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
+       !
+       ! < bound | X^2 | AVEC(i) >
+       !
        !
        USE constants
        USE nrtype
+       USE egs_mod_isqw
        !
        IMPLICIT NONE
        !
-       ! ARGUMENTS
-       REAL(KIND = DP), INTENT(IN) ::  X_max
-       INTEGER(KIND = I4B), INTENT(IN) :: ndim, dim_X, nstates
-       REAL(KIND = DP), DIMENSION(:), INTENT(IN) :: X_grid, aval
-       REAL(KIND = DP), DIMENSION(:,:), INTENT(IN) :: avec_X
-       !
-     END SUBROUTINE E2
+       INTEGER(KIND = I4B), INTENT(IN) :: Iprint, I_toten
+       LOGICAL, INTENT(IN) :: B_numerical, B_analytical
+        !
+     END SUBROUTINE B2_ISQW
      !
-  END INTERFACE E2
+  END INTERFACE B2_ISQW
   !
   INTERFACE Total_Strength
      !
@@ -440,13 +440,14 @@ PROGRAM SQBOX1Df90
   ENDIF
   !
   !
-  ! CALCULATING E1 and E2
+  ! CALCULATING B1 and B2
   IF(I_toten /= 0) THEN
      !
-     CALL E1(dim_BOX, dim_X, X_max, X_grid, Aval_Box, Avec_Box_X, I_toten)
+     CALL B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
      !
      !
-     CALL E2(dim_BOX, dim_X, X_max, X_grid, Aval_Box, Avec_Box_X, I_toten)
+     CALL B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
+     !
   ENDIF
   !
   ! PHASE SHIFT CALCULATION

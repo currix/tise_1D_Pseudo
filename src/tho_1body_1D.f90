@@ -23,6 +23,7 @@ PROGRAM THO_1BODY_1D
   INTEGER(KIND = I4B) :: Isave_EN, Isave_BAS, Isave_WF, I_GS
   ! FLAG TO DISPLAY SUM RULES, E1 and E2
   INTEGER(KIND = I4B) ::  I_sumr, I_toten
+  LOGICAL :: B_met1, B_met2
   !    
   ! FLAG FOR NATURAL UNITS (H2OM = 1)
   INTEGER(KIND = I4B) ::  iad  
@@ -169,9 +170,9 @@ PROGRAM THO_1BODY_1D
      !
   END INTERFACE Ew_Strength
   !
-  INTERFACE E1_THO
+  INTERFACE B1_THO
      !
-     SUBROUTINE E1_THO(Iprint, I_toten)
+     SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
        !
        USE nrtype
        USE constants
@@ -182,10 +183,11 @@ PROGRAM THO_1BODY_1D
        !
        ! ARGUMENTS
        INTEGER(KIND = I4B), INTENT(IN) :: Iprint, I_toten
+       LOGICAL, INTENT(IN) ::  B_met1, B_met2
        !
-     END SUBROUTINE E1_THO
+     END SUBROUTINE B1_THO
      !
-  END INTERFACE E1_THO
+  END INTERFACE B1_THO
   !
   INTERFACE E2_THO
      !
@@ -231,7 +233,8 @@ PROGRAM THO_1BODY_1D
   NAMELIST/INP_MASS/  iad, reduced_mass
   NAMELIST/INP_POT/   Param_pot
   NAMELIST/INP_SHIFT/ I_phase, lambda
-  NAMELIST/INP_AUX/   i_GS, i_SUMR, I_toten, isave_EN, isave_WF, isave_BAS, Iprint
+  NAMELIST/INP_AUX/   i_GS, i_SUMR, I_toten, B_met1, B_met2, &
+       isave_EN, isave_WF, isave_BAS, Iprint
   !
   !
   ! NAMELIST FILE
@@ -526,8 +529,8 @@ PROGRAM THO_1BODY_1D
   ! CALCULATING B1 and B2
   IF(I_toten /= 0) THEN
      !
-     !CALCULATING E1
-     CALL E1_THO(Iprint, I_toten)
+     !CALCULATING B1
+     CALL B1_THO(Iprint, I_toten, B_met1, B_met2)
      !
      !CALCULATING E2
      CALL E2_THO(Iprint, I_toten)
