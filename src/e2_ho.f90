@@ -18,7 +18,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
   REAL(KIND = DP), DIMENSION(:), ALLOCATABLE :: matrix_element, Total_B2
   REAL(KIND = DP), DIMENSION(:,:), ALLOCATABLE ::  matrix_x2,  B2_matrix
   !
-  CHARACTER(LEN=65) :: filename_TM, filename_E2
+  CHARACTER(LEN=65) :: filename_TM, filename_B2
   CHARACTER(LEN=65) :: file = 'B2'
   CHARACTER(LEN=56) :: prog = 'ho'
   !
@@ -78,13 +78,15 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
      !
      ! Define output filename
      IF ( dim_HO < 10) THEN !to avoid spaces
-        WRITE(filename_E2, '(A, "_",A,"_N",I1,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+        WRITE(filename_B2, '(A, "_",A,"_N",I1,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      ELSE IF ( dim_HO < 100) THEN !to avoid spaces
-        WRITE(filename_E2, '(A, "_",A,"_N",I2,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+        WRITE(filename_B2, '(A, "_",A,"_N",I2,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
-        WRITE(filename_E2, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+        WRITE(filename_B2, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      ENDIF
      !
+     !
+     OPEN(UNIT = 78, FILE = filename_B2, STATUS = "UNKNOWN", ACTION = "WRITE")
      !
      IF (B_numerical) THEN
         ! 
@@ -172,7 +174,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
   !
 11 FORMAT (1X,E16.8,1X,E17.8)
 12 FORMAT (1X,E16.8,1X,10E17.8) !!!! Take care of the number of bound states I_toten
-15 FORMAT (2X,I2,A,E16.8,2X,A,I2,A,E17.8)
+15 FORMAT (1X,I3,A,E16.8,2X,A,I3,A,E17.8)
   !
   DEALLOCATE(matrix_element, STAT = Ierr)
   IF (Ierr /= 0) THEN

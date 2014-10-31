@@ -17,7 +17,7 @@ SUBROUTINE B1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
   REAL(KIND = DP), DIMENSION(:), ALLOCATABLE :: matrix_element, Total_B1
   REAL(KIND = DP), DIMENSION(:,:), ALLOCATABLE :: matrix_x,  B1_matrix
   !
-  CHARACTER(LEN=65) :: filename_TM, filename_E1
+  CHARACTER(LEN=65) :: filename_TM, filename_B1
   CHARACTER(LEN=65) :: file = 'B1'
   CHARACTER(LEN=56) :: prog = 'ho'
   !
@@ -73,14 +73,14 @@ SUBROUTINE B1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
      !
      ! Define output filename
      IF ( dim_HO < 10) THEN !to avoid spaces
-        WRITE(filename_E1, '(A, "_",A,"_N",I1,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+        WRITE(filename_B1, '(A, "_",A,"_N",I1,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      ELSE IF ( dim_HO < 100) THEN !to avoid spaces
-        WRITE(filename_E1, '(A, "_",A,"_N",I2,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+        WRITE(filename_B1, '(A, "_",A,"_N",I2,"_",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      ELSE ! Max dim 999 (dim > 999 -> asterisks will appear)
-        WRITE(filename_E1, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
+        WRITE(filename_B1, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_HO, i_state
      ENDIF
      !
-     OPEN(UNIT = 78, FILE = filename_E1, STATUS = "UNKNOWN", ACTION = "WRITE")
+     OPEN(UNIT = 78, FILE = filename_B1, STATUS = "UNKNOWN", ACTION = "WRITE")
      !
      IF (B_numerical) THEN
         !

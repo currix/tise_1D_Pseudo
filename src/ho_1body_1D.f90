@@ -259,8 +259,7 @@ PROGRAM HO_1BODY_1D
   NAMELIST/INP_MASS/  iad, reduced_mass
   NAMELIST/INP_POT/   Param_pot
   NAMELIST/INP_SHIFT/ I_phase, lambda
-  NAMELIST/INP_AUX/   i_GS, i_SUMR, I_toten, B_analytical, B_numerical, & 
-       isave_EN, isave_WF, isave_BAS, Iprint
+  NAMELIST/INP_AUX/   i_GS, isave_EN, isave_WF, isave_BAS, i_SUMR, I_toten, B_analytical, B_numerical, Iprint
   !
   !
   prog = 'ho' !to set output file's names
@@ -452,7 +451,8 @@ PROGRAM HO_1BODY_1D
   !     HAMILTONIAN DIAGONALIZATION
   CALL HARDIAG(apar, 0, 1)
   !
-  ! **4 <x^2>_j=last_bound_state with WS eigenstates ! last_bound_state is an index (minval = 1)
+  ! **4 <x^2>_j=last_bound_state with WS eigenstates 
+  ! note that last_bound_state is an index (minval = 1)
   !
   ALLOCATE(x2_vec(1:dim_X), STAT = Ierr)
   IF (Ierr /= 0) THEN

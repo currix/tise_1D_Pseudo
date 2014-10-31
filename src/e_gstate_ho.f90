@@ -1,6 +1,5 @@
 SUBROUTINE EGS(KVAL,FVAL)
   !
-  ! $Id: e_gstate_ho.f90,v 1.5 2013/05/22 17:57:58 laura Exp $
   !
   USE nrtype
   USE constants
@@ -66,4 +65,5 @@ SUBROUTINE EGS(KVAL,FVAL)
   FVAL = AVAL_HAR(1)
   !
   RETURN
+  !
 END SUBROUTINE EGS
