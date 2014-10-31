@@ -212,9 +212,9 @@ PROGRAM HO_1BODY_1D
   END INTERFACE Phase_shift_HT
   !
   !
-  INTERFACE E1_HO
+  INTERFACE B1_HO
      !
-     SUBROUTINE E1_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
+     SUBROUTINE B1_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
        !
        USE nrtype
        USE constants
@@ -225,16 +225,16 @@ PROGRAM HO_1BODY_1D
        ! ARGUMENTS
        INTEGER(KIND = I4B), INTENT(IN) :: Iprint, I_toten
        REAL(KIND = DP), INTENT(IN) :: apar
-       LOGICAL :: B_numerical, B_analytical
+       LOGICAL, INTENT(IN) :: B_numerical, B_analytical
        !
-     END SUBROUTINE E1_HO
+     END SUBROUTINE B1_HO
      !
-  END INTERFACE E1_HO
+  END INTERFACE B1_HO
 
   !
-  INTERFACE E2_HO
+  INTERFACE B2_HO
      !
-     SUBROUTINE E2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
+     SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
        !
        USE nrtype
        USE constants
@@ -245,11 +245,11 @@ PROGRAM HO_1BODY_1D
        ! ARGUMENTS
        INTEGER(KIND = I4B), INTENT(IN) :: Iprint, I_toten
        REAL(KIND = DP), INTENT(IN) :: apar
-       LOGICAL :: B_numerical, B_analytical
+       LOGICAL, INTENT(IN) :: B_numerical, B_analytical
        !
-     END SUBROUTINE E2_HO
+     END SUBROUTINE B2_HO
      !
-  END INTERFACE E2_HO
+  END INTERFACE B2_HO
   !
   ! DATA INPUT
   !
@@ -259,8 +259,8 @@ PROGRAM HO_1BODY_1D
   NAMELIST/INP_MASS/  iad, reduced_mass
   NAMELIST/INP_POT/   Param_pot
   NAMELIST/INP_SHIFT/ I_phase, lambda
-  NAMELIST/INP_AUX/   i_GS, i_SUMR, I_toten, B_analytical, B_numerical, 
-  & isave_EN, isave_WF, isave_BAS, Iprint
+  NAMELIST/INP_AUX/   i_GS, i_SUMR, I_toten, B_analytical, B_numerical, & 
+       isave_EN, isave_WF, isave_BAS, Iprint
   !
   !
   prog = 'ho' !to set output file's names
@@ -644,10 +644,10 @@ PROGRAM HO_1BODY_1D
   IF(I_toten /= 0) THEN
      !
      !CALCULATING E1
-     CALL E1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
+     CALL B1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
      !
      !CALCULATING E2
-     CALL E2_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
+     CALL B2_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
      !
   ENDIF
   !
