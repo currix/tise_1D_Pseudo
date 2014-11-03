@@ -1,10 +1,10 @@
 #
 #       INPUT FILE FOR HO_1BODY_1D morse pot
 #
-&INP_X     X_MIN = -60.0, X_MAX = 60.0 /
-&INP_DIM   DIM_X = 1701, DIM_HO = 300 /
+&INP_X     X_MIN = -30.0, X_MAX = 30.0 /
+&INP_DIM   DIM_X = 501, DIM_HO = 40, last_bound_state = 3 /
 &INP_MASS iad = 0, REDUCED_MASS = 0.947 /
 &INP_POT   PARAM_POT = 57.25, 0.477860, 0.0, 0.0, 0.0 /
 &INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
 #
-&INP_AUX   I_GS = 0, I_SUMR = 0, I_toten = 0, ISAVE_EN = 1, ISAVE_WF = 0, ISAVE_BAS = 0, IPRINT = 3 /
+&INP_AUX   I_gs = 0, Isave_EN = 1, Isave_WF = 1, Isave_BAS = 0, I_sumr = 0, I_toten = 0, B_analytical = .T., B_numerical = .T, Iprint = 3 /

@@ -2,9 +2,9 @@
 #       INPUT FILE FOR HO_1BODY_1D wsaxon pot bar
 #
 &INP_X     X_MIN = -45.0, X_MAX = 45.0 /
-&INP_DIM   DIM_X = 501, DIM_HO = 40 /
+&INP_DIM   DIM_X = 501, DIM_HO = 40, last_bound_state = 0 /
 &INP_MASS  IAD = 0, REDUCED_MASS = 0.975 /
 &INP_POT   PARAM_POT = -50.0, 2.0, 0.4, 4.0, 30.0  /
 &INP_SHIFT I_PHASE = 1, LAMBDA = 0.1 /
 #
-&INP_AUX   I_GS = 0, I_SUMR = 0, I_toten = 0, ISAVE_EN = 1, ISAVE_WF = 1, ISAVE_BAS = 1, IPRINT = 2 /
+&INP_AUX   I_gs = 0, Isave_EN = 1, Isave_WF = 0, Isave_BAS = 0, I_sumr = 0, I_toten = 1, B_analytical = .T., B_numerical = .T, Iprint = 3 /
