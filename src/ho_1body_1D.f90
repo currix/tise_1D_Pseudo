@@ -408,83 +408,83 @@ PROGRAM HO_1BODY_1D
   !
   !
   IF (last_bound_state /= 0) THEN
-  ! Evaluate the inverse oscillator length with the provided algorithm
-  ! **2 HO basis construction
-  !
-  IF (Iprint > 2) PRINT*,  "HARMONIC BASIS CALCULATION with apar = ", apar, " DIMENSION ", dim_HO     
-  !
-  !  Add one for the calculation of derivatives in the wfp subroutine
-  ALLOCATE(Har_Bas(1:dim_X, 1:dim_HO + 1), STAT = Ierr)    
-  IF (Ierr /= 0) THEN
-     PRINT*, "Har_Bas allocation request denied."
-     STOP
-  ENDIF
-  !
-  CALL HO_1D_BASIS(apar, dim_HO + 1, 0)
-  !
-  ALLOCATE(Aval_Har(1:dim_HO), STAT = Ierr)    
-  IF (Ierr /= 0) THEN
-     PRINT*, "Aval_Har allocation request denied."
-     STOP
-  ENDIF
-  !
-  ALLOCATE(Avec_Har(1:dim_HO, 1:dim_HO), STAT = Ierr)    
-  IF (Ierr /= 0) THEN
-     PRINT*, "Avec_Har allocation request denied."
-     STOP
-  ENDIF
-  !
-  ALLOCATE(Avec_Har_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
-  IF (Ierr /= 0) THEN
-     PRINT*, "Avec_Har_X allocation request denied."
-     STOP
-  ENDIF
-  !
-  ALLOCATE(Avec_Har_Der_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
-  IF (Ierr /= 0) THEN
-     PRINT*, "Avec_Har_Der_X allocation request denied."
-     STOP
-  ENDIF
-  !
-  ! **3 Woods-Saxons (or other pot) wave functions calculations
-  !
-  !     HAMILTONIAN DIAGONALIZATION
-  CALL HARDIAG(apar, 0, 1)
-  !
-  ! **4 <x^2>_j=last_bound_state with WS eigenstates 
-  ! note that last_bound_state is an index (minval = 1)
-  !
-  ALLOCATE(x2_vec(1:dim_X), STAT = Ierr)
-  IF (Ierr /= 0) THEN
-     PRINT*, "x2_vec allocation request denied."
-     STOP
-  ENDIF
-  !
-  !
-  x2_vec = (Avec_Har_X(:,last_bound_state)*X_grid(:))**2
-  !
-  !
-  Ifail = 0
-  Total_Str_WS = 0.0_DP
-  !
-  CALL D01GAF(X_Grid, x2_vec, dim_X, Total_Str_WS, error, Ifail)
-  !
-  DEALLOCATE(x2_vec, STAT = Ierr)
-  IF (Ierr /= 0) THEN
-     PRINT*, "x2_vec deallocation request denied."
-     STOP
-  ENDIF
-  !
-  ! **5 <x^2>_j=last_bound_state with basis calculation 
-  !
-  Total_Str_HO = 7.0_DP/(2.0_DP*apar**2)
-  !
-  ! **6 comparison between **4 and **5 and setting of the new apar
-  !
-  IF ( ABS(Total_Str_HO - Total_Str_WS) > 0.001) THEN
-     apar = SQRT( (2.0_DP*last_bound_state + 1.0_DP)/(2.0_DP*Total_Str_WS) )
-  ENDIF
-  !
+     ! Evaluate the inverse oscillator length with the provided algorithm
+     ! **2 HO basis construction
+     !
+     IF (Iprint > 2) PRINT*,  "HARMONIC BASIS CALCULATION with apar = ", apar, " DIMENSION ", dim_HO     
+     !
+     !  Add one for the calculation of derivatives in the wfp subroutine
+     ALLOCATE(Har_Bas(1:dim_X, 1:dim_HO + 1), STAT = Ierr)    
+     IF (Ierr /= 0) THEN
+        PRINT*, "Har_Bas allocation request denied."
+        STOP
+     ENDIF
+     !
+     CALL HO_1D_BASIS(apar, dim_HO + 1, 0)
+     !
+     ALLOCATE(Aval_Har(1:dim_HO), STAT = Ierr)    
+     IF (Ierr /= 0) THEN
+        PRINT*, "Aval_Har allocation request denied."
+        STOP
+     ENDIF
+     !
+     ALLOCATE(Avec_Har(1:dim_HO, 1:dim_HO), STAT = Ierr)    
+     IF (Ierr /= 0) THEN
+        PRINT*, "Avec_Har allocation request denied."
+        STOP
+     ENDIF
+     !
+     ALLOCATE(Avec_Har_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
+     IF (Ierr /= 0) THEN
+        PRINT*, "Avec_Har_X allocation request denied."
+        STOP
+     ENDIF
+     !
+     ALLOCATE(Avec_Har_Der_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
+     IF (Ierr /= 0) THEN
+        PRINT*, "Avec_Har_Der_X allocation request denied."
+        STOP
+     ENDIF
+     !
+     ! **3 Woods-Saxons (or other pot) wave functions calculations
+     !
+     !     HAMILTONIAN DIAGONALIZATION
+     CALL HARDIAG(apar, 0, 1)
+     !
+     ! **4 <x^2>_j=last_bound_state with WS eigenstates 
+     ! note that last_bound_state is an index (minval = 1)
+     !
+     ALLOCATE(x2_vec(1:dim_X), STAT = Ierr)
+     IF (Ierr /= 0) THEN
+        PRINT*, "x2_vec allocation request denied."
+        STOP
+     ENDIF
+     !
+     !
+     x2_vec = (Avec_Har_X(:,last_bound_state)*X_grid(:))**2
+     !
+     !
+     Ifail = 0
+     Total_Str_WS = 0.0_DP
+     !
+     CALL D01GAF(X_Grid, x2_vec, dim_X, Total_Str_WS, error, Ifail)
+     !
+     DEALLOCATE(x2_vec, STAT = Ierr)
+     IF (Ierr /= 0) THEN
+        PRINT*, "x2_vec deallocation request denied."
+        STOP
+     ENDIF
+     !
+     ! **5 <x^2>_j=last_bound_state with basis calculation 
+     !
+     Total_Str_HO = (2.0_DP*last_bound_state + 1.0_DP)/(2.0_DP*apar**2)
+     !
+     ! **6 comparison between **4 and **5 and setting of the new apar
+     !
+     IF ( ABS(Total_Str_HO - Total_Str_WS) > 0.001) THEN
+        apar = SQRT( (2.0_DP*last_bound_state + 1.0_DP)/(2.0_DP*Total_Str_WS) )
+     ENDIF
+     !
   ENDIF
   !
   ! **7 final HO basis and diagonalization
@@ -540,7 +540,7 @@ PROGRAM HO_1BODY_1D
   ! SAVING EIGENVECTORS
   IF (isave_WF == 1) THEN
      file = 'eigenvectors'
-      IF ( dim_HO < 10) THEN !to avoid spaces
+     IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ELSE IF ( dim_HO < 100) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
