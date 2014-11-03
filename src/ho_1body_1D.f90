@@ -360,7 +360,7 @@ PROGRAM HO_1BODY_1D
         !
         Ifail = 0
         tol = 0.0_DP
-        nev = 50
+        nev = 100
         !
         CALL E04ABF(EGS, tol, tol, k0, k1, nev, kmin, egs0, Ifail)
         !
@@ -407,47 +407,47 @@ PROGRAM HO_1BODY_1D
   apar = SQRT(SQRT(kmin/h_sq_over_m)) 
   !
   !
+  !
+  IF (Iprint > 2) PRINT*,  "HARMONIC BASIS CALCULATION with apar = ", apar, " DIMENSION ", dim_HO     
+  !
+  !  Add one for the calculation of derivatives in the wfp subroutine
+  ALLOCATE(Har_Bas(1:dim_X, 1:dim_HO + 1), STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Har_Bas allocation request denied."
+     STOP
+  ENDIF
+  !
+  ALLOCATE(Aval_Har(1:dim_HO), STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Aval_Har allocation request denied."
+     STOP
+  ENDIF
+  !
+  ALLOCATE(Avec_Har(1:dim_HO, 1:dim_HO), STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Avec_Har allocation request denied."
+     STOP
+  ENDIF
+  !
+  ALLOCATE(Avec_Har_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Avec_Har_X allocation request denied."
+     STOP
+  ENDIF
+  !
+  ALLOCATE(Avec_Har_Der_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Avec_Har_Der_X allocation request denied."
+     STOP
+  ENDIF
+  !
+  ! **2 Woods-Saxons (or other pot) wave functions calculations
   IF (last_bound_state /= 0) THEN
      ! Evaluate the inverse oscillator length with the provided algorithm
-     ! **2 HO basis construction
      !
-     IF (Iprint > 2) PRINT*,  "HARMONIC BASIS CALCULATION with apar = ", apar, " DIMENSION ", dim_HO     
      !
-     !  Add one for the calculation of derivatives in the wfp subroutine
-     ALLOCATE(Har_Bas(1:dim_X, 1:dim_HO + 1), STAT = Ierr)    
-     IF (Ierr /= 0) THEN
-        PRINT*, "Har_Bas allocation request denied."
-        STOP
-     ENDIF
-     !
+     ! **3 HO basis construction
      CALL HO_1D_BASIS(apar, dim_HO + 1, 0)
-     !
-     ALLOCATE(Aval_Har(1:dim_HO), STAT = Ierr)    
-     IF (Ierr /= 0) THEN
-        PRINT*, "Aval_Har allocation request denied."
-        STOP
-     ENDIF
-     !
-     ALLOCATE(Avec_Har(1:dim_HO, 1:dim_HO), STAT = Ierr)    
-     IF (Ierr /= 0) THEN
-        PRINT*, "Avec_Har allocation request denied."
-        STOP
-     ENDIF
-     !
-     ALLOCATE(Avec_Har_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
-     IF (Ierr /= 0) THEN
-        PRINT*, "Avec_Har_X allocation request denied."
-        STOP
-     ENDIF
-     !
-     ALLOCATE(Avec_Har_Der_X(1:dim_X, 1:dim_HO), STAT = Ierr)    
-     IF (Ierr /= 0) THEN
-        PRINT*, "Avec_Har_Der_X allocation request denied."
-        STOP
-     ENDIF
-     !
-     ! **3 Woods-Saxons (or other pot) wave functions calculations
-     !
      !     HAMILTONIAN DIAGONALIZATION
      CALL HARDIAG(apar, 0, 1)
      !
