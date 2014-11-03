@@ -10,10 +10,7 @@ SUBROUTINE HARDIAG(apt, Iprint, Iflag)
   !
   !     FORMAT :: IPRINT  --> VERBOSITY CONTROL
   !
-  !  $Id: ham_mat_1D_1body_ho.f90,v 1.6 2013/05/22 18:02:17 laura Exp laura $
-  !
   !     by Currix TM.
-  !
   !
   USE nrtype
   USE constants
