@@ -7,7 +7,6 @@ SUBROUTINE Total_Strength(nstates, ndim, dim_X, X_grid, avec_X, iprint)
   !  avec_X   :: eigenstates array (X dependence)
   !  iprint   :: verbosity control
   !
-  !  $Id: total_strength.f90,v 1.8 2013/06/13 17:09:27 curro Exp $
   !
   !     by Currix TM.
   !

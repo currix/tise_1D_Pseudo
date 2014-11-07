@@ -1,6 +1,5 @@
 SUBROUTINE Ew_Strength(ndim, dim_X, X_grid, aval, avec_X, nstates)
   !
-  ! $Id: ew_sum_rule.f90,v 1.3 2013/05/05 20:31:56 curro Exp $
   !
   !     by Currix & Laura M.
   !
