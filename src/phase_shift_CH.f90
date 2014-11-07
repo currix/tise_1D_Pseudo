@@ -27,8 +27,6 @@ SUBROUTINE Phase_shift_Ch(Index,ek,eta)
      !
      ELEMENTAL FUNCTION Potf(X)
        !
-       !     WOODS-SAXON 1D POTENTIAL
-       !
        USE nrtype
        USE constants
        USE pot_param

@@ -3,7 +3,6 @@ SUBROUTINE Phase_shift_HT(dim_X, X_grid, avec_X, lambda, Index, ee, ek, eta_1, e
   !     EQ(13) Hazi & Taylor PRA 1 ( 1970) 1109
   !
   !
-  ! $Id: phase_shift_HT.f90,v 1.3 2013/05/05 22:27:25 curro Exp laura $
   !
   ! by Currix TM.
   !
@@ -58,8 +57,6 @@ SUBROUTINE Phase_shift_HT(dim_X, X_grid, avec_X, lambda, Index, ee, ek, eta_1, e
   INTERFACE Potf
      !
      ELEMENTAL FUNCTION Potf(X)
-       !
-       !     WOODS-SAXON 1D POTENTIAL
        !
        USE nrtype
        USE constants
