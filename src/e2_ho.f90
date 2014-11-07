@@ -92,10 +92,10 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
         ! 
         WRITE(*,*) "B2 :: Numerical method, state ", i_state
         !
-        WRITE(78,*) "#   dim_BOX = ", dim_HO, " Integ. radius = ", X_max, " fm"
+        WRITE(78,*) "#   dim_BOX = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_har(i)    B2_numerical**2"
         !
-        DO i = 1, dim_HO
+        DO i = 1, dim_HO_diag
            !     
            matrix_element = Avec_Har_x(:,i_state)*X_grid(:)*X_grid(:)*Avec_Har_x(:,i)  
            !
@@ -129,7 +129,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
         WRITE(78,*) "#Aval_har(i)    B2_analytical**2"
         !
         !
-        DO i = 1, dim_HO
+        DO i = 1, dim_HO_diag
            !
            B2_matrix(i, i_state) =  DOT_PRODUCT(Avec_Har(:, i_state), MATMUL(matrix_x2,Avec_Har(:,i)))
            !
@@ -160,10 +160,10 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
   !
   OPEN(UNIT = 76, FILE = filename_TM, STATUS = "UNKNOWN", ACTION = "WRITE")
   !
-  WRITE(76,*) "# HO  dim_HO = ", dim_HO, " Integ. radius = ", X_max, " fm"
-  WRITE(76,*) "#Aval_har(i)    B2(i,1:n_states)"
+  WRITE(76,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
+  WRITE(76,*) "# Aval_har(i)    B2(i,1:n_states)"
   !
-  DO i = 1, dim_HO
+  DO i = 1, dim_HO_diag
      !
      ! SAVING B2
      WRITE(76,12)  Aval_Har(i), B2_matrix(i,1:I_toten)

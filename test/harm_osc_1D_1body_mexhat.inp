@@ -4,7 +4,7 @@
 #	50 60 10 is double oscillator
 #
 &INP_X     X_MIN = -20.0, X_MAX = 20.0 /
-&INP_DIM   DIM_X = 501, DIM_HO = 90, last_bound_state = 0 /
+&INP_DIM   DIM_X = 501, DIM_HO = 90, last_bound_state = 0, max_aval_har = 0.0 /
 &INP_MASS  IAD = 0, REDUCED_MASS = 0.975 /
 &INP_POT   PARAM_POT = 50.0, 60.0, 10.0, 0.0, 0.0  /
 &INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /

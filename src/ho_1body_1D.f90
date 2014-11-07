@@ -255,7 +255,7 @@ PROGRAM HO_1BODY_1D
   !
   ! NAMELIST DEFINITIONS
   NAMELIST/INP_X/     X_min, X_max
-  NAMELIST/INP_DIM/   dim_X, dim_HO, last_bound_state
+  NAMELIST/INP_DIM/   dim_X, dim_HO, last_bound_state, max_aval_har
   NAMELIST/INP_MASS/  iad, reduced_mass
   NAMELIST/INP_POT/   Param_pot
   NAMELIST/INP_SHIFT/ I_phase, lambda
@@ -490,12 +490,12 @@ PROGRAM HO_1BODY_1D
   ! **7 final HO basis and diagonalization
   !
   CALL HO_1D_BASIS(apar, dim_HO + 1, Iprint)
-  CALL HARDIAG(apar, Iprint, 1)
+  CALL HARDIAG(apar, Iprint, 1)   ! dim_HO_diag computed eigenstates
   !
   !     COMPUTING EIGENVECTOR DERIVATIVES
   !     EIGENSTATE DERIVATIVE
   DO J = 1, dim_X
-     DO I = 1, dim_HO
+     DO I = 1, dim_HO_diag
         CALL WFP(I, J, apar, dim_HO)
      ENDDO
   ENDDO
@@ -549,10 +549,10 @@ PROGRAM HO_1BODY_1D
      ENDIF
      !
      OPEN(UNIT = 71, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(71,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
+     WRITE(71,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
      WRITE(71,*) "#Grid     Eigenvectors"
      DO kx = 1, dim_X
-        WRITE(71,11) X_grid(kx), Avec_Har_X(kx,1:dim_HO)
+        WRITE(71,11) X_grid(kx), Avec_Har_X(kx,1:dim_HO_diag)
      ENDDO
      CLOSE(UNIT = 71)
   ENDIF
@@ -569,10 +569,10 @@ PROGRAM HO_1BODY_1D
      ENDIF
      !
      OPEN(UNIT = 72, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(72,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
+     WRITE(72,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
      WRITE(72,*) "#Grid    Eigenvector derivatives"
      DO kx = 1, dim_X
-        WRITE(72,11) X_grid(kx), Avec_Har_Der_X(kx,1:dim_HO)
+        WRITE(72,11) X_grid(kx), Avec_Har_Der_X(kx,1:dim_HO_diag)
      ENDDO
      CLOSE(UNIT = 72)
   ENDIF
@@ -590,9 +590,9 @@ PROGRAM HO_1BODY_1D
      ENDIF
      !
      OPEN(UNIT = 73, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(73,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
+     WRITE(73,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
      WRITE(73,*) "# Eigenvalues"
-     DO I = 1, dim_HO
+     DO I = 1, dim_HO_diag
         WRITE(73,10) I, Aval_Har(I)
      ENDDO
      CLOSE(UNIT = 73)
@@ -606,7 +606,7 @@ PROGRAM HO_1BODY_1D
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
      OPEN(UNIT = 74, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(74,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
+     WRITE(74,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
      WRITE(74,*) "#Grid    Potential    10*Eigenfunctions+eigenvalue"
      !
      file = 'pot_eigvec2'
@@ -618,11 +618,11 @@ PROGRAM HO_1BODY_1D
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
      OPEN(UNIT = 75, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(75,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
+     WRITE(75,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
      WRITE(75,*) "#Grid    Potential    10*Eigenfunctions^2+eigenvalue"
      DO kx = 1, dim_X
-        WRITE(74,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_Har_X(kx,1:dim_HO) + Aval_Har(1:dim_HO)
-        WRITE(75,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_Har_X(kx,1:dim_HO)**2 + Aval_Har(1:dim_HO)
+        WRITE(74,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_Har_X(kx,1:dim_HO_diag) + Aval_Har(1:dim_HO_diag)
+        WRITE(75,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_Har_X(kx,1:dim_HO_diag)**2 + Aval_Har(1:dim_HO_diag)
      ENDDO
      CLOSE(UNIT = 74)
      CLOSE(UNIT = 75)
@@ -634,9 +634,9 @@ PROGRAM HO_1BODY_1D
   !
   IF (I_SUMR /= 0) THEN
      ! COMPUTE TOTAL SUM RULE STRENGTH
-     CALL Total_Strength(i_SUMR, dim_HO, dim_X, X_grid, Avec_Har_X, Iprint)
+     CALL Total_Strength(i_SUMR, dim_HO_diag, dim_X, X_grid, Avec_Har_X, Iprint)
      ! COMPUTE ENERGY WEIGHTED SUM RULE STRENGTH
-     CALL EW_STRENGTH(dim_HO, dim_X, X_grid, Aval_Har, Avec_Har_X, I_sumr)
+     CALL EW_STRENGTH(dim_HO_diag, dim_X, X_grid, Aval_Har, Avec_Har_X, I_sumr)
   ENDIF
   !
   !
@@ -655,31 +655,34 @@ PROGRAM HO_1BODY_1D
   IF (I_phase == 1) THEN
      IF (Iprint > 1) PRINT*, "PHASE SHIFT CALCULATION"
      file = 'phase_shift_ht'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
-     IF ( dim_HO > 99) THEN 
+     ELSE IF ( dim_HO < 100) THEN 
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
+     !
      OPEN(UNIT = 76, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(76,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
+     WRITE(76,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
      WRITE(76,*) "#2ek/Pi    Phase shift (Hazi and Taylor calculation)"
      !
      file = 'phase_shift_ch'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
      IF ( dim_HO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_HO
-     ENDIF
-     IF ( dim_HO > 99) THEN 
+     ELSE IF ( dim_HO < 100) THEN 
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_HO
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_HO
      ENDIF
+     !
      OPEN(UNIT = 77, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(77,*) "# HO  dim_HO = ", dim_HO, " Box radius = ", X_max, " fm"
+     WRITE(77,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
      WRITE(77,*) "#2ek/Pi      Phase shift (Chadan calculation)"
      !
      print*, "eta1 and eta2 are the phase shift tangent"
-     DO I = 1, dim_HO
+     DO I = 1, dim_HO_diag
+        !
         IF (Aval_Har(I) > 0.0_DP) THEN
            ee = Aval_Har(I)
            ek = SQRT((2.0D0*ee)/h_sq_over_m)

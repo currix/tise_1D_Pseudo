@@ -1,8 +1,8 @@
 #
 #       INPUT FILE FO HO_1BODY_1D
 #
-&INP_X     X_MIN = -130.0, X_MAX = 130.0 /
-&INP_DIM   DIM_X = 1501, DIM_HO = 250, last_bound_state = 3 /
+&INP_X     X_MIN = -140.0, X_MAX = 140.0 /
+&INP_DIM   DIM_X = 1501, DIM_HO = 500, last_bound_state = 3, max_aval_har = 10.0 /
 &INP_MASS  IAD = 4, REDUCED_MASS = 0.975 /
 &INP_POT   PARAM_POT = -50.0, 2.0, 0.4, 0.0, 0.0  /
 &INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /

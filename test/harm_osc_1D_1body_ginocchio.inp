@@ -2,7 +2,7 @@
 #       INPUT FILE FOR HO_1BODY_1D ginocchio pot
 #
 &INP_X     X_MIN = -25.0, X_MAX = 25.0 /
-&INP_DIM   DIM_X = 601, DIM_HO = 20, last_bound_state = 0 /
+&INP_DIM   DIM_X = 601, DIM_HO = 20, last_bound_state = 0, max_aval_har = 0.0 /
 &INP_MASS  IAD = 1, REDUCED_MASS = 1.0 /
 &INP_POT   PARAM_POT = 0.62, 1, 0.5, 0.0, 0.0  /
 &INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /

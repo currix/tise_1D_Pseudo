@@ -86,10 +86,10 @@ SUBROUTINE B1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
         !
         WRITE(*,*) "B1 :: Numerical method, state ", i_state
         !
-        WRITE(78,*) "#   dim_BOX = ", dim_HO, " Integ. radius = ", X_max, " fm"
+        WRITE(78,*) "#   dim_BOX = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_har(i)    B1_numerical**2"
         !
-        DO i = 1, dim_HO
+        DO i = 1, dim_HO_diag
            !     
            matrix_element = Avec_Har_x(:,i_state)*X_grid(:)*Avec_Har_x(:,i)  
            !
@@ -120,10 +120,10 @@ SUBROUTINE B1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
         WRITE(*,*) "B1 :: Analytical method, state ", i_state
         !
         ! File header
-        WRITE(78,*) "#   dim_BOX = ", dim_HO, " Integ. radius = ", X_max, " fm"
+        WRITE(78,*) "#   dim_BOX = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_har(i)    B1_analytical**2"
         !
-        DO i = 1, dim_HO
+        DO i = 1, dim_HO_diag
            !
            B1_matrix(i, i_state) =  DOT_PRODUCT(Avec_Har(:,i_state), MATMUL(matrix_x,Avec_Har(:,i)))
            !
@@ -157,7 +157,7 @@ SUBROUTINE B1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
   WRITE(76,*) "# HO  dim_HO = ", dim_HO, " Integ. radius = ", X_max, " fm"
   WRITE(76,*) "#Aval_har(i)    B1(i,1:n_states)"
   !
-  DO i = 1, dim_HO
+  DO i = 1, dim_HO_diag
      !
      ! SAVING B1
      WRITE(76,12)  Aval_Har(i), B1_matrix(i,1:I_toten)

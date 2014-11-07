@@ -104,16 +104,25 @@ SUBROUTINE HARDIAG(apt, Iprint, Iflag)
      PRINT*, "Pot_vec deallocation request denied."
      STOP
   ENDIF
-  !     DIAGONALIZATION USING LAPACK
-  IF (Iflag == 1) THEN
-     CALL LA_SYEVR(A=Ham_Mat, W=AVAL_HAR, JOBZ='V', UPLO='L')
+  !     DIAGONALIZATION USING LAPACK 95
+  IF (max_aval_har == 0.0) THEN
+     IF (Iflag == 1) THEN
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_HAR, JOBZ='V', UPLO='L')
+     ELSE
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_HAR, JOBZ='N', UPLO='L')
+     ENDIF
+     dim_HO_diag = dim_HO
   ELSE
-     CALL LA_SYEVR(A=Ham_Mat, W=AVAL_HAR, JOBZ='N', UPLO='L')
+     IF (Iflag == 1) THEN
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_HAR, JOBZ='V', VU = max_aval_har, M = dim_HO_diag, UPLO='L')
+     ELSE
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_HAR, JOBZ='N', VU = max_aval_har, M = dim_HO_diag, UPLO='L')
+     ENDIF
   ENDIF
   !
   IF (Iprint >= 1) THEN
-     PRINT*, "EIGENVALUES IN A ", dim_HO, " DIM HARMONIC BASIS"
-     DO I = 1, dim_HO
+     PRINT*, dim_HO_diag," EIGENVALUES COMPUTED IN A ", dim_HO, " DIM HARMONIC BASIS"
+     DO I = 1, dim_HO_diag
         WRITE(*,*) I, AVAL_HAR(I)
      ENDDO
   ENDIF
@@ -127,7 +136,7 @@ SUBROUTINE HARDIAG(apt, Iprint, Iflag)
      AVEC_HAR_X = 0.0_DP
      !
      DO KX = 1, dim_X
-        DO I = 1, dim_HO
+        DO I = 1, dim_HO_diag
            DO J = 1, dim_HO
               AVEC_HAR_X(KX,I) = AVEC_HAR_X(KX,I) + Ham_Mat(J,I)*HAR_BAS(KX,J)
            ENDDO
