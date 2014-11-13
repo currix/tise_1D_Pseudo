@@ -1,10 +1,11 @@
-PROGRAM SQBOX1Df90
+PROGRAM SQBOX_1BODY_1D
   !
   !
   !     PROGRAM THAT SOLVES NUMERICALLY THE 1D SCHROEDINGER EQUATION 
   !     USING AN INF SQUARE WELL BASIS FOR A GENERAL POTENTIAL.
   !
-  !     OUTPUT ::
+  !     OUTPUT :: See documentation
+  !
   !       BASIS FUNCTIONS ::  X_i F_1(X_i) ... F_dim(X_i)
   !
   !       EIGENFUNCTIONS  ::  X_i EF_1(X_i) ... EF_dim(X_i)
@@ -207,11 +208,11 @@ PROGRAM SQBOX1Df90
   !
   ! NAMELIST DEFINITIONS
   NAMELIST/INP_X/     X_min, X_max
-  NAMELIST/INP_DIM/   dim_X, dim_BOX
+  NAMELIST/INP_DIM/   dim_X, dim_BOX, max_aval_BOX
   NAMELIST/INP_MASS/  Iad, reduced_mass
   NAMELIST/INP_POT/   Param_pot
   NAMELIST/INP_SHIFT/ Iphase, lambda
-  NAMELIST/INP_AUX/   Igs, IsaveEN, IsaveWF, IsaveBAS, I_sumr, I_toten, Iprint 
+  NAMELIST/INP_AUX/   Igs, IsaveEN, IsaveWF, IsaveBAS, I_sumr, I_toten, B_analytical, B_numerical, Iprint 
   !
   !
   ! READING INPUT
@@ -223,7 +224,7 @@ PROGRAM SQBOX1Df90
   IF (Iprint>3) WRITE(*,*) ' Reading xmin, xmax'
   !
   READ(UNIT=*,NML=INP_DIM) 
-  IF (Iprint>3) WRITE(*,*) ' Reading box basis dimension'
+  IF (Iprint>3) WRITE(*,*) ' Reading box and xgrid basis dimension'
   dim_X = dim_X + 2 ! TO ACCOMODATE X_min AND X_max
   !
   READ(UNIT=*,NML=INP_MASS)
@@ -238,10 +239,6 @@ PROGRAM SQBOX1Df90
   !
   !
   !     PROGRAM VERSION
-  IF (Iprint>1) &
-       WRITE(*,*) &
-       '$Id: infsq_box_1D.f90,v 1.5 2013/06/13 12:28:16 curro Exp $'         
-  !
   prog = 'isqw' !to set output file's names
   !
   !     DEFINE PROBLEM UNITS
@@ -338,13 +335,15 @@ PROGRAM SQBOX1Df90
   !     SAVING BOX BASIS
   IF (IsaveBAS==1) THEN
      file = 'basis'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     !
      IF ( dim_BOX < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_BOX
-     ENDIF
-     IF ( dim_BOX > 99) THEN 
+     ELSE IF ( dim_BOX < 100) THEN 
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      ENDIF
+     !
      OPEN(UNIT = 70, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(70,*) "# INFSQ  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
      WRITE(70,*) "#Grid     Infinite squared well basis"
@@ -357,73 +356,85 @@ PROGRAM SQBOX1Df90
   !     SAVING EIGENVECTORS
   IF (IsaveWF==1) THEN
      file = 'eigenvectors'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      IF ( dim_BOX < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_BOX
-     ENDIF
-     IF ( dim_BOX > 99) THEN 
+     ELSE IF ( dim_BOX < 99) THEN 
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      ENDIF
+     !
      OPEN(UNIT = 71, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(71,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
+     WRITE(71,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
      WRITE(71,*) "#Grid    Eigenvectors"
+     !
      DO kx = 1, dim_X
-        WRITE(71,11) X_grid(kx), (Avec_Box_X(kx,kkx), kkx=1, dim_BOX)
+        WRITE(71,11) X_grid(kx), (Avec_Box_X(kx,kkx), kkx=1, dim_BOX_diag)
      ENDDO
+     !
      CLOSE(UNIT = 71)
   ENDIF
   !
   !
   !     SAVING ENERGIES
   IF (IsaveEN==1) THEN
+     !
      file = 'eigenvalues'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     !
      IF ( dim_BOX < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_BOX
-     ENDIF
-     IF ( dim_BOX > 99) THEN 
+     ELSE IF ( dim_BOX < 100) THEN !to avoid spaces
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      ENDIF
+     !
      OPEN(UNIT = 73, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(73,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
-     WRITE(73,*) "# Eigenvalues"
-     DO i = 1, dim_BOX
+     WRITE(73,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
+     WRITE(73,*) "# Eigenvalues  Max_aval_BOX = ", Max_aval_box
+     !
+     DO i = 1, dim_BOX_diag
         WRITE(73,10) i, Aval_Box(i)
      ENDDO
+     !
      CLOSE(UNIT = 73)
      !
      file = 'pot_eigvec'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      IF ( dim_BOX < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_BOX
-     ENDIF
-     IF ( dim_BOX > 99) THEN 
+     ELSE IF ( dim_BOX < 100) THEN 
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      ENDIF
+     !
      OPEN(UNIT = 74, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(74,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
+     !
+     WRITE(74,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
      WRITE(74,*) "#Grid    Potential    10*Eigenfunctions+eigenvalue"
      !
      file = 'pot_eigvec2'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      IF ( dim_BOX < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_BOX
-     ENDIF
-     IF ( dim_BOX > 99) THEN 
+     ELSE IF ( dim_BOX < 100) THEN 
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      ENDIF
+     !
      OPEN(UNIT = 75, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(75,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
+     !
+     WRITE(75,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
      WRITE(75,*) "#Grid    Potential    10*Eigenfunctions^2+eigenvalue"
      DO kx = 1, dim_X
         WRITE(74,11) X_grid(kx), Potf(X_grid(kx)), &
-             (10.0_dp*Avec_Box_X(kx,kkx)+Aval_Box(kkx), kkx=1, dim_BOX)
+             10.0_dp*Avec_Box_X(kx,1:dim_BOX_diag)+Aval_Box(1:dim_BOX_diag)
      ENDDO
      DO kx = 1, dim_X
         WRITE(75,11) X_grid(kx), Potf(X_grid(kx)), &
-             (10.0_dp*Avec_Box_X(kx,kkx)*Avec_Box_X(kx,kkx)+Aval_Box(kkx), &
-             kkx=1, dim_BOX)
+             10.0_dp*Avec_Box_X(kx,1:dim_BOX_diag)**2+Aval_Box(1:dim_BOX_diag)
      ENDDO
+     !
      CLOSE(UNIT = 74)
      CLOSE(UNIT = 75)
   ENDIF
@@ -434,9 +445,9 @@ PROGRAM SQBOX1Df90
   !
   IF (i_SUMR /= 0) THEN
      ! COMPUTE TOTAL SUM RULE STRENGTH
-     !CALL TOTAL_STRENGTH(i_SUMR, dim_BOX, dim_X, X_grid, Avec_Box_X, Iprint)
+     CALL TOTAL_STRENGTH(i_SUMR, dim_BOX_diag, dim_X, X_grid, Avec_Box_X, Iprint)
      ! COMPUTE ENERGY WEIGHTED SUM RULE STRENGTH
-     CALL EW_STRENGTH(dim_BOX, dim_X, X_grid, Aval_Box, Avec_Box_X, I_sumr)
+     CALL EW_STRENGTH(dim_BOX_diag, dim_X, X_grid, Aval_Box, Avec_Box_X, I_sumr)
   ENDIF
   !
   !
@@ -454,17 +465,19 @@ PROGRAM SQBOX1Df90
   IF (Iphase == 1) THEN
      IF (Iprint > 1) PRINT*, "PHASE SHIFT CALCULATION"
      file = 'phase_shift_ht'
-     WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      IF ( dim_BOX < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_BOX
-     ENDIF
-     IF ( dim_BOX > 99) THEN 
+     ELSE IF ( dim_BOX < 100) THEN 
+        WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_BOX
+     ELSE
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_BOX
      ENDIF
+     !
      OPEN(UNIT = 76, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(76,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
      WRITE(76,*) "#2ek/Pi    Phase shift (Hazi and Taylor calculation)"
-     DO i = 1, dim_BOX
+     !
+     DO i = 1, dim_BOX_diag
         IF (Aval_Box(i) > 0.0_DP) THEN
            ee = Aval_Box(i)
            ek = SQRT((2.0D0*ee)/h_sq_over_m)
@@ -481,8 +494,45 @@ PROGRAM SQBOX1Df90
      CLOSE(UNIT = 76)
   ENDIF
   !
+  ! DEALLOCATE ARRAYS
+  !
+  DEALLOCATE(X_grid, STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "X_grid deallocation request denied."
+     STOP
+  ENDIF
+  !
+  DEALLOCATE(BOX_BAS, STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Box_Bas allocation request denied."
+     STOP
+  ENDIF
+  !
+  DEALLOCATE(Aval_Box, STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Aval_Box deallocation request denied."
+     STOP
+  ENDIF
+  !
+  DEALLOCATE(Avec_Box, STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Avec_Box deallocation request denied."
+     STOP
+  ENDIF
+  !
+  DEALLOCATE(Avec_Box_X, STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "Avec_Box_X deallocation request denied."
+     STOP
+  ENDIF
+  !
+  DEALLOCATE(Avec_Box_Der_X, STAT = Ierr)    
+  IF (Ierr /= 0) THEN
+     PRINT*, "AVEC_BOX_DER_X deallocation request denied."
+     STOP
+  ENDIF
   !
   !
   STOP "SAYONARA BABY..."
   !
-END PROGRAM SQBOX1DF90
+END PROGRAM SQBOX_1BODY_1D

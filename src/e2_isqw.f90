@@ -122,10 +122,10 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
         IF (Iprint > 0) WRITE(*,*), "B2 :: ", i_state,"-th state :: Numerical method"
         !
         ! File header
-        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
+        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_box(i)    B2_numerical**2"
         !
-        DO i = 1, DIM_BOX
+        DO i = 1, DIM_BOX_diag
            !     
            matrix_element = Avec_box_x(:,i_state)*X_grid(:)*X_grid(:)*Avec_box_x(:,i)  
            !
@@ -134,7 +134,8 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
            !
            CALL D01GAF(X_Grid, matrix_element, dim_X, B2_matrix(i, i_state), error, Ifail)
            !
-           WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <",i_state,"| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
+           IF (Iprint > 0) &
+                WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <",i_state,"| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
            !
            Total_B2(i_state) = Total_B2(i_state) + (B2_matrix(i, i_state)**2)
            !
@@ -151,19 +152,20 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
      IF (B_analytical) THEN 
         !
         !
-        WRITE(*,*), "Analytical method"
+        WRITE(*,*) "B2 :: Analytical method, state ", i_state
         !
         ! File header
-        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
+        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_box(i)    B2_analytical**2"
         !
-        DO i = 1, DIM_BOX
+        DO i = 1, DIM_BOX_diag
            !
            B2_analytical = DOT_PRODUCT(Avec_box(:,i_state), MATMUL(matrix_x2,Avec_box(:,i)))
            !
            B2_matrix(i, i_state) = B2_analytical
            !
-           IF (Iprint > 0) WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <", i_state,"| X^2 |Avec(",i,")> = ",  B2_analytical
+           IF (Iprint > 0) &
+                WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <", i_state,"| X^2 |Avec(",i,")> = ",  B2_analytical
            !
            ! SAVING B2
            WRITE(78,11)  Aval_box(i), B2_matrix(i, i_state)**2
@@ -197,7 +199,7 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
   WRITE(76,*) "#Aval_box(i)    B2_numerical"
   !
   DO i = 1, dim_BOX     
-     ! SAVING E2
+     ! SAVING B2
      WRITE(76,12)  Aval_box(i), B2_matrix(i,1:I_toten)
      !
   ENDDO

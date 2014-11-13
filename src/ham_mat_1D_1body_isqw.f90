@@ -3,14 +3,6 @@ SUBROUTINE BOXDIAG(XMpar, Iprint)
   !     COMPUTES AND DIAGONALIZES 1D HAMILTONIAN USING A BOXBASIS
   !
   !     INPUT      :: XMPAR    --> PI/(2 X_MAX)
-  !     VARIABLES  :: dim_X    --> XGRID DIMENSION
-  !                   X_grid   --> VECTOR WITH X GRID
-  !                   PARAM    --> POTENTIAL PARAMETERS
-  !                   BOXBAS   --> ARRAY WITH THE BASIS
-  !                   dim_BOX  --> BOX BASIS DIMENSION
-  !
-  !     OUTPUT     :: AVALBOX --> VECTOR WITH ENERGIES
-  !                   AVECBOX --> ARRAY WITH EIGENVECTORS
   !
   !     FORMAT     :: IPRINT  --> VERBOSITY CONTROL
   !
@@ -90,7 +82,7 @@ SUBROUTINE BOXDIAG(XMpar, Iprint)
   !    HAMILTONIAN MATRIX
   !
   DO i = 1, dim_BOX
-     ai = 1.0_dp*i
+     ai = REAL(i, DP)
      !     KINETIC ENERGY 
      Ham_Mat(i,i) = Ham_Mat(i,i) + XMpar2*ai*ai
      !     
@@ -115,16 +107,30 @@ SUBROUTINE BOXDIAG(XMpar, Iprint)
   !
   !
   !     DIAGONALIZATION USING LAPACK 95
-  CALL LA_SYEVR(A=Ham_Mat, W=Aval_Box, JOBZ='V', UPLO='L')
+  IF (max_aval_box == 0.0) THEN
+     CALL LA_SYEVR(A=Ham_Mat, W=Aval_Box, JOBZ='V', UPLO='L')
+     !
+     dim_BOX_diag = dim_BOX
+  ELSE
+     CALL LA_SYEVR(A=Ham_Mat, W=AVAL_Box, JOBZ='V', VU = max_aval_box, M = dim_BOX_diag, UPLO='L')
+  ENDIF
   !     
   IF (Iprint>=1) THEN
      WRITE(*,*) "EIGENVALUES IN A ", dim_BOX, " DIM BOX BASIS"
-     DO i = 1, dim_BOX
+     DO i = 1, dim_BOX_diag
         WRITE(*,*) i, Aval_Box(i)
      ENDDO
   ENDIF
   !
+  IF (Iprint >= 1) THEN
+     PRINT*, dim_BOX_diag," EIGENVALUES COMPUTED IN A ", dim_BOX, " DIM ISQW BASIS"
+     DO I = 1, dim_BOX_diag
+        WRITE(*,*) I, AVAL_BOX(I)
+     ENDDO
+  ENDIF
+  !
   !     EIGENVECTOR MATRIX
+  !
   Avec_Box = Ham_Mat
   Avec_Box_x = 0.0_dp
   !

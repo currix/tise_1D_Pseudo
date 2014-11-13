@@ -14,9 +14,10 @@ MODULE egs_mod_isqw
   !
   ! 
   ! BOX BASIS DIMENSION
-  INTEGER(KIND = I4B) :: dim_BOX
+  INTEGER(KIND = I4B) :: dim_BOX, dim_BOX_diag
   ! BOX BASIS, EIGENVALUES AND EIGENVECTORS
   REAL(KIND = DP),  DIMENSION(:), ALLOCATABLE :: Aval_Box
+  REAL(KIND = DP)  :: max_aval_BOX ! Maximum value of energies considered
   REAL(KIND = DP), DIMENSION(:,:), ALLOCATABLE ::  Box_Bas, Avec_Box, Avec_Box_X
   ! EIGENVECTOR DERIVATIVES
   REAL(KIND = DP), DIMENSION(:,:), ALLOCATABLE :: Avec_Box_Der_X

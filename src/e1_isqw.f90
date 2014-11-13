@@ -17,7 +17,7 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
   REAL(KIND = DP), DIMENSION(:), ALLOCATABLE :: matrix_element, Total_B1
   REAL(KIND = DP), DIMENSION(:,:), ALLOCATABLE ::  matrix_x,  B1_matrix
   !
-  CHARACTER(LEN=65) :: filename_TM, filename_E1
+  CHARACTER(LEN=65) :: filename_TM, filename_B1
   CHARACTER(LEN=65) :: file = 'B1'
   CHARACTER(LEN=56) :: prog = 'isqw'
   !
@@ -76,14 +76,14 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
      !
      ! Define output filename
      IF ( dim_BOX < 10) THEN !to avoid spaces
-        WRITE(filename_E1, '(A, "_",A,"_N",I1,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
+        WRITE(filename_B1, '(A, "_",A,"_N",I1,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
      ELSE IF ( dim_BOX < 100) THEN 
-        WRITE(filename_E1, '(A, "_",A,"_N",I2,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
+        WRITE(filename_B1, '(A, "_",A,"_N",I2,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
      ELSE 
-        WRITE(filename_E1, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
+        WRITE(filename_B1, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
      ENDIF
      !
-     OPEN(UNIT = 78, FILE = filename_E1, STATUS = "UNKNOWN", ACTION = "WRITE")
+     OPEN(UNIT = 78, FILE = filename_B1, STATUS = "UNKNOWN", ACTION = "WRITE")
      !
      !
      IF (B_numerical) THEN
@@ -91,10 +91,10 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
         IF (Iprint > 0) WRITE(*,*), "B1 :: ", i_state,"-th state :: Numerical method"
         !
         ! File header
-        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
+        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_box(i)    B1_numerical**2"
         !
-        DO i = 1, DIM_BOX
+        DO i = 1, dim_BOX_diag
            !     
            matrix_element = Avec_box_x(:,i_state)*X_grid(:)*Avec_box_x(:,i)  
            !
@@ -119,13 +119,13 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
      !
      IF (B_analytical) THEN 
         !
-        WRITE(*,*), "Analytical method"
+        IF (Iprint > 0) WRITE(*,*), "B1 :: ", i_state,"-th state :: Analytical method"
         !
         ! File header
-        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, " Box radius = ", X_max, " fm"
+        WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_box(i)    B1_analytical**2"
         !
-        DO i = 1, DIM_BOX
+        DO i = 1, DIM_BOX_diag
            !
            B1_analytical = DOT_PRODUCT(Avec_box(:,i_state),MATMUL(matrix_x,Avec_box(:,i)))
            !
