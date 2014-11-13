@@ -107,7 +107,8 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
            !
            CALL D01GAF(X_Grid, matrix_element, dim_X, B2_numerical, error, Ifail)
            !
-           WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i,"| X^2 |Avec(",i,")> = ", B2_numerical
+           IF (Iprint > 0) &
+                WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i,"| X^2 |Avec(",i,")> = ", B2_numerical
            !
            B2_matrix(i, i_state) =  B2_numerical
            !
@@ -136,7 +137,8 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
            !
            B2_matrix(i, i_state) =  DOT_PRODUCT(Avec_Har(:, i_state), MATMUL(matrix_x2,Avec_Har(:,i)))
            !
-           WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i, "| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
+           IF (Iprint > 0) &
+                WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i, "| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
            !
            ! SAVING B2
            WRITE(78,11)  Aval_Har(i), B2_matrix(i, i_state)**2
@@ -177,7 +179,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
   !
 11 FORMAT (1X,E16.8,1X,E17.8)
 12 FORMAT (1X,E16.8,1X,10E17.8) !!!! Take care of the number of bound states I_toten
-15 FORMAT (1X,I3,A,E16.8,2X,A,I3,A,E17.8)
+15 FORMAT (2X,I3,A,E16.8,2X,A,I3,A,I3,A,E17.8)
   !
   DEALLOCATE(matrix_element, STAT = Ierr)
   IF (Ierr /= 0) THEN
