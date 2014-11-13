@@ -591,7 +591,7 @@ PROGRAM HO_1BODY_1D
      !
      OPEN(UNIT = 73, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(73,*) "# HO  dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Box radius = ", X_max, " fm"
-     WRITE(73,*) "# Eigenvalues"
+     WRITE(73,*) "# Eigenvalues  Max_aval_har = ", Max_aval_har 
      DO I = 1, dim_HO_diag
         WRITE(73,10) I, Aval_Har(I)
      ENDDO
