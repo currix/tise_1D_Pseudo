@@ -108,7 +108,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
            CALL D01GAF(X_Grid, matrix_element, dim_X, B2_numerical, error, Ifail)
            !
            IF (Iprint > 0) &
-                WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i,"| X^2 |Avec(",i,")> = ", B2_numerical
+                WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i_state,"| X^2 |Avec(",i,")> = ", B2_numerical
            !
            B2_matrix(i, i_state) =  B2_numerical
            !
@@ -138,7 +138,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
            B2_matrix(i, i_state) =  DOT_PRODUCT(Avec_Har(:, i_state), MATMUL(matrix_x2,Avec_Har(:,i)))
            !
            IF (Iprint > 0) &
-                WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i, "| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
+                WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i_state, "| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
            !
            ! SAVING B2
            WRITE(78,11)  Aval_Har(i), B2_matrix(i, i_state)**2
