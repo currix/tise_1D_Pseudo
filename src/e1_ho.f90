@@ -1,6 +1,6 @@
 SUBROUTINE B1_HO(Iprint, I_toten, apar, B_analytical, B_numerical)
   !
-  ! <GS|X|AVEC(i)>
+  ! < bound |X| AVEC(i) >
   !
   USE constants
   USE nrtype

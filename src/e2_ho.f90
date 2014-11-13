@@ -1,6 +1,6 @@
 SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
   !
-  ! <GS|X^2|AVEC(i)>
+  ! < bound |X^2| AVEC(i) >
   !
   !
   USE constants
@@ -30,12 +30,6 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
      STOP
   ENDIF
   !
-  ALLOCATE(matrix_x2(1:dim_HO,1:dim_HO), STAT = Ierr)
-  IF (Ierr /= 0) THEN
-     PRINT*, "matrix_x2 allocation request denied."
-     STOP
-  ENDIF
-  !
   ALLOCATE(Total_B2(1:I_toten), STAT = Ierr)
   IF (Ierr /= 0) THEN
      PRINT*, "Total_B2  allocation request denied."
@@ -52,25 +46,34 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
   !
   !
   ! Build the < x^2 > matrix_x2 in the HO basis
-  ! Diagonal
-  matrix_x2 = 0.0_DP
-  DO j = 0, dim_HO - 1
-     rj = j*1.0_dp
-     matrix_x2(j+1,j+1) = (1.0_dp/apar**2)*( (2*j+1)/2.0_dp )
-  ENDDO
+  IF (B_analytical) THEN
+     !
+     ALLOCATE(matrix_x2(1:dim_HO,1:dim_HO), STAT = Ierr)
+     IF (Ierr /= 0) THEN
+        PRINT*, "matrix_x2 allocation request denied."
+        STOP
+     ENDIF
+     !
+     ! Diagonal
+     matrix_x2 = 0.0_DP
+     DO j = 0, dim_HO - 1
+        rj = j*1.0_dp
+        matrix_x2(j+1,j+1) = (1.0_dp/apar**2)*( (2*j+1)/2.0_dp )
+     ENDDO
+     !
+     ! Upper Diagonal
+     DO j = 2, dim_HO - 1
+        rj = j*1.0_dp
+        matrix_x2(j-1,j+1) = (1.0_dp/apar**2)*SQRT(rj*(rj-1))/2.0_dp
+     ENDDO
+     !
+     ! Lower Diagonal
+     DO j = 0, dim_HO - 3
+        rj = j*1.0_dp
+        matrix_x2(j+3,j+1) = (1.0_dp/apar**2)*SQRT((rj+1)*(rj+2))/2.0_dp
+     ENDDO
   !
-  ! Upper Diagonal
-  DO j = 2, dim_HO - 1
-     rj = j*1.0_dp
-     matrix_x2(j-1,j+1) = (1.0_dp/apar**2)*SQRT(rj*(rj-1))/2.0_dp
-  ENDDO
-  !
-  ! Lower Diagonal
-  DO j = 0, dim_HO - 3
-     rj = j*1.0_dp
-     matrix_x2(j+3,j+1) = (1.0_dp/apar**2)*SQRT((rj+1)*(rj+2))/2.0_dp
-  ENDDO
-  !
+  ENDIF
   !
   !
   ! Main Loop
@@ -104,7 +107,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
            !
            CALL D01GAF(X_Grid, matrix_element, dim_X, B2_numerical, error, Ifail)
            !
-           WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " < bnd | X^2 |Avec(",i,")> = ", B2_numerical
+           WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i,"| X^2 |Avec(",i,")> = ", B2_numerical
            !
            B2_matrix(i, i_state) =  B2_numerical
            !
@@ -125,7 +128,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
         WRITE(*,*) "B2 :: Analytical method, state ", i_state
         !
         !
-        WRITE(78,*) "#   dim_BOX = ", dim_HO, " Integ. radius = ", X_max, " fm"
+        WRITE(78,*) "#   dim_BOX = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
         WRITE(78,*) "#Aval_har(i)    B2_analytical**2"
         !
         !
@@ -133,7 +136,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
            !
            B2_matrix(i, i_state) =  DOT_PRODUCT(Avec_Har(:, i_state), MATMUL(matrix_x2,Avec_Har(:,i)))
            !
-           WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <bnd | X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
+           WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i, "| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
            !
            ! SAVING B2
            WRITE(78,11)  Aval_Har(i), B2_matrix(i, i_state)**2
@@ -182,10 +185,13 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
      STOP
   ENDIF
   !
-  DEALLOCATE(matrix_x2, STAT = Ierr)
-  IF (Ierr /= 0) THEN
-     PRINT*, "matrix_x2 deallocation request denied."
-     STOP
+  IF (B_analytical) THEN
+     !
+     DEALLOCATE(matrix_x2, STAT = Ierr)
+     IF (Ierr /= 0) THEN
+        PRINT*, "matrix_x2 deallocation request denied."
+        STOP
+     ENDIF
   ENDIF
   !
   DEALLOCATE(Total_B2, STAT = Ierr)

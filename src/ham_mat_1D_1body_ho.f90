@@ -111,6 +111,7 @@ SUBROUTINE HARDIAG(apt, Iprint, Iflag)
      ELSE
         CALL LA_SYEVR(A=Ham_Mat, W=AVAL_HAR, JOBZ='N', UPLO='L')
      ENDIF
+     !
      dim_HO_diag = dim_HO
   ELSE
      IF (Iflag == 1) THEN
