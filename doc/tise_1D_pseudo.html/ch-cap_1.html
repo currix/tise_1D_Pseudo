@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+
+<html>
+
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+
+<title>tise_1D_pseudo User's Guide - Installation guide</title>
+
+<link href="index.html" rel="start">
+<link href="ch-cap_0.html" rel="prev">
+<link href="ch-cap_2.html" rel="next">
+<link href="index.html#contents" rel="contents">
+<link href="index.html#copyright" rel="copyright">
+<link href="ch-cap_0.html" rel="chapter" title="1 Introduction">
+<link href="ch-cap_1.html" rel="chapter" title="2 Installation guide">
+<link href="ch-cap_2.html" rel="chapter" title="3 Getting Started">
+<link href="ch-cap_ref.html" rel="chapter" title="4 References">
+<link href="ch-cap_0.html#s-sec_0_1" rel="section" title="1.1 What's tise_1D_pseudo?">
+<link href="ch-cap_0.html#s-sec_0_2" rel="section" title="1.2 Copyright statement">
+<link href="ch-cap_2.html#s-sec_2_0" rel="section" title="3.1 Input file for the Harmonic Oscillator (HO) basis case">
+<link href="ch-cap_2.html#s-sec_2_0_1_4" rel="subsection" title="3.1.1 Program Execution">
+
+</head>
+
+<body>
+
+<p><a name="ch-cap_1"></a></p>
+<hr>
+
+<p>
+[ <a href="ch-cap_0.html">previous</a> ]
+[ <a href="index.html#contents">Contents</a> ]
+[ <a href="ch-cap_0.html">1</a> ]
+[ 2 ]
+[ <a href="ch-cap_2.html">3</a> ]
+[ <a href="ch-cap_ref.html">4</a> ]
+[ <a href="ch-cap_2.html">next</a> ]
+</p>
+
+<hr>
+
+<h1>
+<code>tise_1D_pseudo</code> User's Guide
+<br>Chapter 2 - Installation guide
+</h1>
+
+<hr>
+
+<p>
+The libraries lapack95, minpack, and intlib libraries are needed.  The program
+files can be found in <samp>git</samp> and a zip file can be dowloaded using
+<samp>wget</samp> as follows
+</p>
+
+<pre>
+     wget https://github.com/currix/tise_1D_Pseudo/archive/master.zip
+</pre>
+
+<p>
+The files should be unpacked and the usual compilation steps follow
+</p>
+
+<pre>
+     $ unzip master.zip 
+     Archive:  master.zip
+     3309629b189bc4a2ca777862fd102d7df45276bf
+        creating: tise_1D_Pseudo-master/
+      extracting: tise_1D_Pseudo-master/.gitignore  
+       inflating: tise_1D_Pseudo-master/LICENSE  
+           .
+           .
+           .
+       inflating: tise_1D_Pseudo-master/test/tho_wsaxon_1D_1body.inp  
+     $ ls
+     master.zip  tise_1D_Pseudo-master/
+     $ cd tise_1D_Pseudo-master/
+     $ ls
+     bin/  LICENSE  README  REFERENCES  src/  test/
+     $ cd src/
+     $ make clean
+     [pts/4][curro.deckard: src]$ make all
+     gfortran -c  -Wall -I/usr/local/lib/lapack95/lapack95_modules -I/usr/local/include/lapack95_modules -c nrtype.f90
+          .
+          .
+          .
+     gfortran -o ../bin//morse_1body_1D_ISQW  nrtype.o constants.o pot_param.o egs_mod_isqw.o infsq_box_1D.o build_ISQW_bas.o ham_mat_1D_1body_isqw.o e1_isqw.o e2_isqw.o ew_sum_rule.o total_strength.o morse_pot.o phase_shift_HT.o -L/usr/local/lib/NAG -lnag -L/usr/local/lib/lapack95 -llapack95 -L/usr/local/lib -llapack95 -llapack -lblas
+</pre>
+
+<p>
+The directory structure is the following
+</p>
+<ol type="1" start="1" >
+<li>
+<p>
+<samp>bin</samp>: executable files.
+</p>
+</li>
+</ol>
+<ol type="1" start="2" >
+<li>
+<p>
+<samp>src</samp>: <code>Fortran 90</code> source files and
+<code>Makefile</code>.
+</p>
+</li>
+</ol>
+<ol type="1" start="3" >
+<li>
+<p>
+<samp>doc</samp>: program documentation (this file) in several formats.
+</p>
+</li>
+</ol>
+<ol type="1" start="4" >
+<li>
+<p>
+<samp>test</samp>: input files
+</p>
+</li>
+</ol>
+
+<p>
+Most of the program names follow the convention
+<var>potential</var><samp>_1body_1D_</samp><var>BAS</var> where the potentials
+included are <var>potential</var>
+</p>
+<ol type="1" start="1" >
+<li>
+<p>
+Woods Saxon (<samp>wsaxon</samp>)
+</p>
+</li>
+</ol>
+<ol type="1" start="2" >
+<li>
+<p>
+Woods Saxon with a barrier (<samp>barrierws</samp>)
+</p>
+</li>
+</ol>
+<ol type="1" start="3" >
+<li>
+<p>
+Mexican hat (<samp>mexhat</samp>)
+</p>
+</li>
+</ol>
+<ol type="1" start="4" >
+<li>
+<p>
+Ginocchio (<samp>ginocchio</samp>)
+</p>
+</li>
+</ol>
+<ol type="1" start="5" >
+<li>
+<p>
+Morse (<samp>morse</samp>)
+</p>
+</li>
+</ol>
+<ol type="1" start="6" >
+<li>
+<p>
+Poeschl-Teller (<samp>pteller</samp>)
+</p>
+</li>
+</ol>
+<ol type="1" start="7" >
+<li>
+<p>
+Hazi and Taylor (<samp>ht</samp>).
+</p>
+</li>
+</ol>
+
+<p>
+The available bases for the Hamiltonian construction and diagonalization are
+</p>
+<ol type="1" start="1" >
+<li>
+<p>
+Harmonic Oscillator (HO)
+</p>
+</li>
+</ol>
+<ol type="1" start="2" >
+<li>
+<p>
+Transformed Harmonic Oscillator (THO)
+</p>
+</li>
+</ol>
+<ol type="1" start="3" >
+<li>
+<p>
+Infinite Square Well Box (ISQW)
+</p>
+</li>
+</ol>
+
+<p>
+Other executable files:
+</p>
+<ol type="1" start="1" >
+<li>
+<p>
+<code>program_launcher_1body_N</code>: <code>Perl</code> script to launch the
+provided programs to look for energy convergence or to prepare grace figure
+files.
+</p>
+</li>
+</ol>
+<ol type="1" start="2" >
+<li>
+<p>
+<code>dBde_script</code>: <code>Perl</code> script to compute dB/dE from the B1
+or B2 program output for pseudostates.
+</p>
+</li>
+</ol>
+
+<p>
+If the programs works correctly in your system you can also, running as
+<em>root</em> user, install them, by default under the directory
+<code>/usr/local/bin</code>.  The associated Perl scripts will also be
+installed in this directory.  In this case it is very convenient to add the
+directory<code>/usr/local/bin</code> to the default <samp>$PATH</samp>
+variable.  As aforementioned, in order to install the program it you should do
+it as superuser or using <code>sudo</code>
+</p>
+
+<pre>
+     $ sudo make install
+     [sudo] password for sudouser: 
+     $ ls  /usr/local/bin/
+</pre>
+
+<p>
+If you want to remove these files you can also do it executing <samp>sudo make
+uninstall</samp>.
+</p>
+
+<hr>
+
+<p>
+[ <a href="ch-cap_0.html">previous</a> ]
+[ <a href="index.html#contents">Contents</a> ]
+[ <a href="ch-cap_0.html">1</a> ]
+[ 2 ]
+[ <a href="ch-cap_2.html">3</a> ]
+[ <a href="ch-cap_ref.html">4</a> ]
+[ <a href="ch-cap_2.html">next</a> ]
+</p>
+
+<hr>
+
+<p>
+<code>tise_1D_pseudo</code> User's Guide
+</p>
+
+<address>
+Version 1<br>
+<br>
+Curro Perez-Bernal <code><a href="mailto:francisco.perez@dfaie.uhu.es">francisco.perez@dfaie.uhu.es</a></code><br>
+Laura Moschini <code><a href="mailto:laura.moschini@pd.infn.it">laura.moschini@pd.infn.it</a></code><br>
+<br>
+</address>
+<hr>
+
+</body>
+
+</html>
+

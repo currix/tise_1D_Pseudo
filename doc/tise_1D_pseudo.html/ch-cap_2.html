@@ -1,0 +1,585 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+
+<html>
+
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+
+<title>tise_1D_pseudo User's Guide - Getting Started</title>
+
+<link href="index.html" rel="start">
+<link href="ch-cap_1.html" rel="prev">
+<link href="ch-cap_ref.html" rel="next">
+<link href="index.html#contents" rel="contents">
+<link href="index.html#copyright" rel="copyright">
+<link href="ch-cap_0.html" rel="chapter" title="1 Introduction">
+<link href="ch-cap_1.html" rel="chapter" title="2 Installation guide">
+<link href="ch-cap_2.html" rel="chapter" title="3 Getting Started">
+<link href="ch-cap_ref.html" rel="chapter" title="4 References">
+<link href="ch-cap_0.html#s-sec_0_1" rel="section" title="1.1 What's tise_1D_pseudo?">
+<link href="ch-cap_0.html#s-sec_0_2" rel="section" title="1.2 Copyright statement">
+<link href="ch-cap_2.html#s-sec_2_0" rel="section" title="3.1 Input file for the Harmonic Oscillator (HO) basis case">
+<link href="ch-cap_2.html#s-sec_2_0_1_4" rel="subsection" title="3.1.1 Program Execution">
+
+</head>
+
+<body>
+
+<p><a name="ch-cap_2"></a></p>
+<hr>
+
+<p>
+[ <a href="ch-cap_1.html">previous</a> ]
+[ <a href="index.html#contents">Contents</a> ]
+[ <a href="ch-cap_0.html">1</a> ]
+[ <a href="ch-cap_1.html">2</a> ]
+[ 3 ]
+[ <a href="ch-cap_ref.html">4</a> ]
+[ <a href="ch-cap_ref.html">next</a> ]
+</p>
+
+<hr>
+
+<h1>
+<code>tise_1D_pseudo</code> User's Guide
+<br>Chapter 3 - Getting Started
+</h1>
+
+<hr>
+
+<p>
+We proceed to describe the input file and the program execution for each case.
+</p>
+
+<hr>
+
+<h2><a name="s-sec_2_0"></a>3.1 Input file for the Harmonic Oscillator (HO) basis case</h2>
+
+<p>
+The provided input file is a <samp>namelist</samp> input file with the
+following structure (e.g.  <code>test/harm_osc_1D_1body_wsaxon.inp</code>
+</p>
+
+<pre>
+     #
+     #       INPUT FILE FO HO_1BODY_1D
+     #
+     &amp;INP_X     X_MIN = -140.0, X_MAX = 140.0 /
+     &amp;INP_DIM   Dim_X = 1501, Dim_HO = 500, last_bound_state = 3, Max_aval_har = 10.0 /
+     &amp;INP_MASS  IAD = 4, Reduced_mass = 0.975 /
+     &amp;INP_POT   PARAM_POT = -50.0, 2.0, 0.4, 0.0, 0.0  /
+     &amp;INP_SHIFT I_PHASE = 0, Lambda = 0.1 /
+     #
+     &amp;INP_AUX   I_gs = 0, Isave_EN = 1, Isave_WF = 0, Isave_BAS = 0, I_sumr = 0, I_toten = 3, B_analytical = .T., B_numerical = .T, Iprint = 3 /
+     #
+     #
+</pre>
+
+<p>
+Variables defined:
+</p>
+<ol type="1" start="1" >
+<li>
+<p>
+<samp>X_min, X_max</samp>: <em>float</em> type.  Spatial interval where the
+harmonic oscillator basis is defined expressed in <em>fm</em> units.
+</p>
+</li>
+</ol>
+<ol type="1" start="2" >
+<li>
+<p>
+<samp>Dim_X</samp>: <em>integer</em> type.  Number of points in the spatial
+grid from <samp>X_min</samp> to <samp>X_max</samp>.
+</p>
+</li>
+</ol>
+<ol type="1" start="3" >
+<li>
+<p>
+<samp>Dim_HO</samp>: <em>integer</em> type.  Size of the truncated HO basis
+used in the calculation.
+</p>
+</li>
+</ol>
+<ol type="1" start="4" >
+<li>
+<p>
+<samp>Last_Bound_State</samp>: <em>integer</em> type.  If the potential has
+several bound states, state used to estimate the HO length scale.
+</p>
+</li>
+</ol>
+<ol type="1" start="5" >
+<li>
+<p>
+<samp>Max_aval_har</samp>: <em>float</em> type.  If different from zero,
+calculate only system eigenstates with energies less than
+<samp>Max_aval_har</samp> (MeV units).  If <samp>Max_aval_har = 0.0</samp>
+calculate all eigenstates.
+</p>
+</li>
+</ol>
+<ol type="1" start="6" >
+<li>
+<p>
+<samp>IAD</samp>: <em>integer</em> type.  If <samp>IAD = 1</samp> then unitless
+quantities are defined (hbar^2/1 amu = 1) and <samp>kmin = 1</samp> else we
+optimize the <samp>kmin</samp> value to minimize the energy of the ground state
+using a N=1 basis.  (To Do: recipe for weakly bound states).
+</p>
+</li>
+</ol>
+<ol type="1" start="7" >
+<li>
+<p>
+<samp>REDUCED_MASS</samp>: <em>float</em> type.  Reduced mass of the system
+expressed in <em>amu</em>.
+</p>
+</li>
+</ol>
+<ol type="1" start="8" >
+<li>
+<p>
+<samp>PARAM_POT</samp>: <em>float</em> type.  Potential parameters.
+</p>
+</li>
+</ol>
+<ol type="1" start="9" >
+<li>
+<p>
+<samp>I_PHASE</samp>: <em>integer</em> type.  If this variable is not zero the
+phase shifts are computed using the Hazi and Taylor approach.
+</p>
+</li>
+</ol>
+<ol type="1" start="10" >
+<li>
+<p>
+<samp>Lambda</samp>: <em>float</em> type.  Lambda parameter in the Hazi and
+Taylor calculation of the phase shift[<a href="footnotes.html#f1"
+name="fr1">1</a>].
+</p>
+</li>
+</ol>
+<ol type="1" start="11" >
+<li>
+<p>
+<samp>I_gs</samp>: <em>integer</em> type.  If <samp>I_gs = 1</samp> the
+<code>gs_wavefunction.dat</code> file is saved with the system ground state
+wavefunction and a header with the system info.
+</p>
+</li>
+</ol>
+<ol type="1" start="12" >
+<li>
+<p>
+<samp>Isave_EN</samp>: <em>integer</em> type.  If <samp>Isave_EN = 1</samp> the
+following data are saved.  The system eigenvalues are saved in a file with name
+<code>ho_eigenvalues_N<var>dimbasis</var>.dat</code> file is saved (unit 73)
+with the system eigenvalues and a header with the system info.  The system
+potential and eigenstates are saved in a file with name
+<code>ho_poteigvec_N<var>dimbasis</var>.dat</code> file (unit 74) with the
+following format
+</p>
+
+<pre>
+     x  Potential(x) 10xEigvec_1(x)+Eigval(1) 10xEigvec_2(x)+Eigval(2) .... 10xEigvec_dim(x)+Eigval(2)
+</pre>
+
+<p>
+Another file, named <code>ho_pot_eigvec2_N<var>dimbasis</var>.dat</code> file
+is saved (unit 75) with the same format than the previous one but storing the
+squared values of the wavefunctions as a function of the spatial coordinate.
+</p>
+</li>
+</ol>
+<ol type="1" start="13" >
+<li>
+<p>
+<samp>Isave_WF</samp>: <em>integer</em> type.  If <samp>Isave_WF = 1</samp> the
+eigenvectors and eigenvector derivatives are saved in files named
+<code>ho_eigenvectors_N<var>dimbasis</var>.dat</code> and
+<code>ho_eigvec_der_N<var>dimbasis</var>.dat</code> with the format
+</p>
+
+<pre>
+     x  Eigvec_1(x) Eigvec_2(x) ... Eigvec_dim(x)
+</pre>
+
+<p>
+The units involved are unit 71 and 72, respectively.
+</p>
+</li>
+</ol>
+<ol type="1" start="14" >
+<li>
+<p>
+<samp>Isave_BAS</samp>: <em>integer</em> type.  If <samp>Isave_BAS = 1</samp>
+the harmonic oscillator basis wavefunctions are saved in a file named
+<code>ho_basis_N<var>dimbasis</var>.dat</code> with the format
+</p>
+
+<pre>
+     x  ho_1(x) ho_2(x) ... ho_dim(x)
+</pre>
+
+<p>
+The unit involved is unit 70.
+</p>
+</li>
+</ol>
+<ol type="1" start="15" >
+<li>
+<p>
+<samp>I_sumr</samp>: <em>integer</em> type.  If <samp>I_sumr</samp> is nonzero
+(and positive) the sum rules for the total strength is computed for the first
+<samp>I_sumr</samp> eigenstates and the energy weighted strength is computed
+for the ground state.  Results are displayed.
+</p>
+</li>
+</ol>
+<ol type="1" start="16" >
+<li>
+<p>
+<samp>I_toten</samp>: <em>integer</em> type.  If <samp>I_toten</samp> is
+nonzero (and positive) the B1 and B2 values of the transitions of the first
+<samp>I_toten</samp> eigenstates to the rest of the states are computed.
+</p>
+</li>
+</ol>
+<ol type="1" start="17" >
+<li>
+<p>
+<samp>B_analytical</samp>: <em>logical</em> type.  If <samp>B_analytical</samp>
+is true the B1 and B2 values of the transitions of the first
+<samp>I_toten</samp> eigenstates to the rest of the states are computed using
+the HO properties as a matrix product.
+</p>
+</li>
+</ol>
+<ol type="1" start="18" >
+<li>
+<p>
+<samp>B_numerical</samp>: <em>logical</em> type.  If <samp>B_numerical</samp>
+is true the B1 and B2 values of the transitions of the first
+<samp>I_toten</samp> eigenstates to the rest of the states are computed using a
+numerical integration algorithm.
+</p>
+</li>
+</ol>
+<ol type="1" start="19" >
+<li>
+<p>
+<samp>IPRINT</samp>: <em>integer</em> type.  Program output verbosity.  Mainly
+for debugging purposes.  Possible values in the interval 0-5.
+</p>
+</li>
+</ol>
+
+<hr>
+
+<h3><a name="s-sec_2_0_1_4"></a>3.1.1 Program Execution</h3>
+
+<p>
+We run the case of a Woods-Saxon potential using the input file given above.
+Assuming the input file is in the <code>test</code> directory we run the file
+with the command
+</p>
+
+<pre>
+     test$ ../bin/wsaxon_1body_1D_HO &lt; harm_osc_1D_1body_wsaxon.inp
+</pre>
+
+<p>
+An excerpt of the output is as follows
+</p>
+
+<pre>
+       X grid step =   0.18641810918774968      fm
+      kmin =    11.301296611404950       kmin - k10 =   -51.198703388595050       a =   0.71795315591406850       EGS =   -39.559250365551563     
+      MINIMUM:: kmin =    11.301296611404950       a =   0.71795315591406850       EGS =   -39.559250365551563     
+      HARMONIC BASIS CALCULATION with apar =   0.71795315591406850       DIMENSION          500
+      BUILDING HARMONIC BASIS
+      HARMONIC FUNCTION            1  NORMALIZATION   1.0000000000000000     
+      HARMONIC FUNCTION            2  NORMALIZATION   1.0000000000000002     
+      HARMONIC FUNCTION            3  NORMALIZATION   1.0000000000000000     
+      HARMONIC FUNCTION            4  NORMALIZATION   1.0000000000000004     
+      .
+      .
+      .
+      HARMONIC FUNCTION          498  NORMALIZATION  0.99999999999999889     
+      HARMONIC FUNCTION          499  NORMALIZATION  0.99999999999999889     
+      HARMONIC FUNCTION          500  NORMALIZATION  0.99999999999999922     
+      HARMONIC FUNCTION          501  NORMALIZATION   1.0000000000000013     
+      DONE
+      BUILDING HAMILTONIAN MATRIX
+               44  EIGENVALUES COMPUTED IN A          500  DIM HARMONIC BASIS
+                1  -39.575743429858143     
+                2  -17.870764051008919     
+                3 -0.51376864785484155     
+                4   2.2161186319837708E-002
+                5   2.5262705152647863E-002
+                .
+                .
+                .
+               42   8.8266692344274524     
+               43   9.2066002755550400     
+               44   9.7283452731211177     
+      CALCULATING B1
+      B1 :: Numerical method, state            1
+         1-th state energy:  -0.39575743E+02   &lt;  1| X |Avec(  1)&gt; =   -0.14160336E-15
+         2-th state energy:  -0.17870764E+02   &lt;  1| X |Avec(  2)&gt; =   -0.98820380E+00
+         3-th state energy:  -0.51376865E+00   &lt;  1| X |Avec(  3)&gt; =    0.13902742E-16
+         4-th state energy:   0.22161186E-01   &lt;  1| X |Avec(  4)&gt; =   -0.98409246E-03
+         5-th state energy:   0.25262705E-01   &lt;  1| X |Avec(  5)&gt; =   -0.13041464E-13
+         .
+         .
+         .
+        42-th state energy:   0.88266692E+01   &lt;  1| X |Avec( 42)&gt; =    0.75484771E-02
+        43-th state energy:   0.92066003E+01   &lt;  1| X |Avec( 43)&gt; =    0.20201704E-14
+        44-th state energy:   0.97283453E+01   &lt;  1| X |Avec( 44)&gt; =    0.71621324E-02
+      Total B1:            1  0.97756688413360182     
+      B1 :: Analytical method, state            1
+         1-th state energy:  -0.39575743E+02   &lt;  1| X |Avec(  1)&gt; =    0.78354220E-16
+         2-th state energy:  -0.17870764E+02   &lt;  1| X |Avec(  2)&gt; =   -0.98820380E+00
+         3-th state energy:  -0.51376865E+00   &lt;  1| X |Avec(  3)&gt; =   -0.15379148E-15
+         4-th state energy:   0.22161186E-01   &lt;  1| X |Avec(  4)&gt; =   -0.98409246E-03
+         5-th state energy:   0.25262705E-01   &lt;  1| X |Avec(  5)&gt; =   -0.13047748E-13
+         .
+         .
+         .
+        42-th state energy:   0.88266692E+01   &lt;  1| X |Avec( 42)&gt; =    0.75484771E-02
+        43-th state energy:   0.92066003E+01   &lt;  1| X |Avec( 43)&gt; =    0.20615985E-14
+        44-th state energy:   0.97283453E+01   &lt;  1| X |Avec( 44)&gt; =    0.71621324E-02
+      Total B1:            1   1.9551337682672085     
+      B1 :: Numerical method, state            2
+         1-th state energy:  -0.39575743E+02   &lt;  2| X |Avec(  1)&gt; =   -0.98820380E+00
+         2-th state energy:  -0.17870764E+02   &lt;  2| X |Avec(  2)&gt; =   -0.30863643E-14
+         3-th state energy:  -0.51376865E+00   &lt;  2| X |Avec(  3)&gt; =    0.12096876E+01
+         4-th state energy:   0.22161186E-01   &lt;  2| X |Avec(  4)&gt; =   -0.75968651E-12
+         5-th state energy:   0.25262705E-01   &lt;  2| X |Avec(  5)&gt; =    0.65649404E-01
+         .
+         .
+         .
+        42-th state energy:   0.88266692E+01   &lt;  2| X |Avec( 42)&gt; =    0.90378367E-13
+        43-th state energy:   0.92066003E+01   &lt;  2| X |Avec( 43)&gt; =   -0.12875681E+00
+        44-th state energy:   0.97283453E+01   &lt;  2| X |Avec( 44)&gt; =   -0.55810040E-13
+      Total B1:            2   3.0885322344655424     
+      B1 :: Analytical method, state            2
+         1-th state energy:  -0.39575743E+02   &lt;  2| X |Avec(  1)&gt; =   -0.98820380E+00
+         2-th state energy:  -0.17870764E+02   &lt;  2| X |Avec(  2)&gt; =   -0.23754587E-14
+         3-th state energy:  -0.51376865E+00   &lt;  2| X |Avec(  3)&gt; =    0.12096876E+01
+         4-th state energy:   0.22161186E-01   &lt;  2| X |Avec(  4)&gt; =   -0.75967669E-12
+         5-th state energy:   0.25262705E-01   &lt;  2| X |Avec(  5)&gt; =    0.65649404E-01
+         .
+         .
+         .
+        42-th state energy:   0.88266692E+01   &lt;  2| X |Avec( 42)&gt; =    0.90206680E-13
+        43-th state energy:   0.92066003E+01   &lt;  2| X |Avec( 43)&gt; =   -0.12875681E+00
+        44-th state energy:   0.97283453E+01   &lt;  2| X |Avec( 44)&gt; =   -0.55837081E-13
+      Total B1:            2   6.1770644689310874     
+      B1 :: Numerical method, state            3
+         1-th state energy:  -0.39575743E+02   &lt;  3| X |Avec(  1)&gt; =    0.13902742E-16
+         2-th state energy:  -0.17870764E+02   &lt;  3| X |Avec(  2)&gt; =    0.12096876E+01
+         3-th state energy:  -0.51376865E+00   &lt;  3| X |Avec(  3)&gt; =   -0.15634269E-12
+         4-th state energy:   0.22161186E-01   &lt;  3| X |Avec(  4)&gt; =   -0.14078074E+01
+         5-th state energy:   0.25262705E-01   &lt;  3| X |Avec(  5)&gt; =   -0.19173235E-10
+         .
+         .
+         .
+        42-th state energy:   0.88266692E+01   &lt;  3| X |Avec( 42)&gt; =    0.25086853E+00
+        43-th state energy:   0.92066003E+01   &lt;  3| X |Avec( 43)&gt; =   -0.20341090E-13
+        44-th state energy:   0.97283453E+01   &lt;  3| X |Avec( 44)&gt; =    0.22883743E+00
+      Total B1:            3   34.162824527021456     
+      B1 :: Analytical method, state            3
+         1-th state energy:  -0.39575743E+02   &lt;  3| X |Avec(  1)&gt; =   -0.15379148E-15
+         2-th state energy:  -0.17870764E+02   &lt;  3| X |Avec(  2)&gt; =    0.12096876E+01
+         3-th state energy:  -0.51376865E+00   &lt;  3| X |Avec(  3)&gt; =   -0.15730241E-12
+         4-th state energy:   0.22161186E-01   &lt;  3| X |Avec(  4)&gt; =   -0.14078074E+01
+         5-th state energy:   0.25262705E-01   &lt;  3| X |Avec(  5)&gt; =   -0.19172769E-10
+         .
+         .
+         .
+        42-th state energy:   0.88266692E+01   &lt;  3| X |Avec( 42)&gt; =    0.25086853E+00
+        43-th state energy:   0.92066003E+01   &lt;  3| X |Avec( 43)&gt; =   -0.20346665E-13
+        44-th state energy:   0.97283453E+01   &lt;  3| X |Avec( 44)&gt; =    0.22883743E+00
+      Total B1:            3   68.325649054042913     
+      CALCULATING B2
+      B2 :: Numerical method, state            1
+        1-th state energy:  -0.39575743E+02   &lt; bnd | X^2 |Avec(  1)&gt; =    0.97792289E+00
+        2-th state energy:  -0.17870764E+02   &lt; bnd | X^2 |Avec(  2)&gt; =    0.19534173E-14
+        3-th state energy:  -0.51376865E+00   &lt; bnd | X^2 |Avec(  3)&gt; =   -0.10810122E+01
+        4-th state energy:   0.22161186E-01   &lt; bnd | X^2 |Avec(  4)&gt; =    0.73594905E-12
+        5-th state energy:   0.25262705E-01   &lt; bnd | X^2 |Avec(  5)&gt; =   -0.60024484E-01
+        .
+        .
+        .
+       42-th state energy:   0.88266692E+01   &lt; bnd | X^2 |Avec( 42)&gt; =   -0.47565637E-14
+       43-th state energy:   0.92066003E+01   &lt; bnd | X^2 |Avec( 43)&gt; =    0.14978555E+00
+       44-th state energy:   0.97283453E+01   &lt; bnd | X^2 |Avec( 44)&gt; =   -0.88318993E-14
+      Total B2:            1   2.7847318688712841     
+      B2 :: Analytical method, state            1
+        1-th state energy:  -0.39575743E+02   &lt;bnd | X^2 |Avec(  1)&gt; =    0.97792289E+00
+        2-th state energy:  -0.17870764E+02   &lt;bnd | X^2 |Avec(  2)&gt; =    0.11143904E-14
+        3-th state energy:  -0.51376865E+00   &lt;bnd | X^2 |Avec(  3)&gt; =   -0.10810122E+01
+        4-th state energy:   0.22161186E-01   &lt;bnd | X^2 |Avec(  4)&gt; =    0.73597443E-12
+        5-th state energy:   0.25262705E-01   &lt;bnd | X^2 |Avec(  5)&gt; =   -0.60024484E-01
+        .
+        .
+        .
+       42-th state energy:   0.88266692E+01   &lt;bnd | X^2 |Avec( 42)&gt; =   -0.46121711E-14
+       43-th state energy:   0.92066003E+01   &lt;bnd | X^2 |Avec( 43)&gt; =    0.14978555E+00
+       44-th state energy:   0.97283453E+01   &lt;bnd | X^2 |Avec( 44)&gt; =   -0.87897090E-14
+      Total B2 =            1   5.5694637377425691     
+      B2 :: Numerical method, state            2
+        1-th state energy:  -0.39575743E+02   &lt; bnd | X^2 |Avec(  1)&gt; =    0.19534173E-14
+        2-th state energy:  -0.17870764E+02   &lt; bnd | X^2 |Avec(  2)&gt; =    0.31915150E+01
+        3-th state energy:  -0.51376865E+00   &lt; bnd | X^2 |Avec(  3)&gt; =    0.50963500E-13
+        4-th state energy:   0.22161186E-01   &lt; bnd | X^2 |Avec(  4)&gt; =   -0.74668969E-01
+        5-th state energy:   0.25262705E-01   &lt; bnd | X^2 |Avec(  5)&gt; =    0.23493682E-11
+        .
+        .
+        .
+       42-th state energy:   0.88266692E+01   &lt; bnd | X^2 |Avec( 42)&gt; =    0.31615217E-12
+       43-th state energy:   0.92066003E+01   &lt; bnd | X^2 |Avec( 43)&gt; =    0.86716506E+00
+       44-th state energy:   0.97283453E+01   &lt; bnd | X^2 |Avec( 44)&gt; =   -0.43781858E-13
+      Total B2:            3   4395.9771563158238     
+      B2 :: Analytical method, state            3
+        1-th state energy:  -0.39575743E+02   &lt;bnd | X^2 |Avec(  1)&gt; =   -0.10810122E+01
+        2-th state energy:  -0.17870764E+02   &lt;bnd | X^2 |Avec(  2)&gt; =    0.51724769E-13
+        3-th state energy:  -0.51376865E+00   &lt;bnd | X^2 |Avec(  3)&gt; =    0.34446553E+02
+        4-th state energy:   0.22161186E-01   &lt;bnd | X^2 |Avec(  4)&gt; =    0.24159193E-09
+        5-th state energy:   0.25262705E-01   &lt;bnd | X^2 |Avec(  5)&gt; =   -0.19760799E+02
+        .
+        .
+        .
+       42-th state energy:   0.88266692E+01   &lt;bnd | X^2 |Avec( 42)&gt; =    0.32220505E-12
+       43-th state energy:   0.92066003E+01   &lt;bnd | X^2 |Avec( 43)&gt; =    0.86716506E+00
+       44-th state energy:   0.97283453E+01   &lt;bnd | X^2 |Avec( 44)&gt; =   -0.37139116E-13
+      Total B2 =            3   8791.9543126316366
+</pre>
+
+<p>
+The output is quite verbose for the given options.  Note that the onset of the
+output for <samp>IPRINT</samp> larger than one are the display of the main
+parameter values and a check of the HO basis normalization.  This should be
+checked whenever either the basis dimension or the spatial grid parameter
+change their values.
+</p>
+
+<p>
+The output proceeds with the system energies, with negative values for the
+bound states and positive values for the discretized pseudostate continuum.
+</p>
+
+<p>
+The program then computes the B1 and B2 values for the three bound states as
+<samp>I_toten = 3</samp>.  In each case depending on the values of the logical
+variables <samp>B_analytical</samp> and <samp>B_numerical</samp> two possible
+outputs can be displayed; one computed with the numerical integral (called
+<samp>Numerical method</samp>) and the other algebraically using the HO
+properties (calle <samp>Analytical method</samp>).  Both should coincide.
+</p>
+
+<p>
+The following files are saved, note that the <samp>N250</samp> part of the name
+varies with the <samp>N</samp> value and that in this case there are three
+bound states and we are asking for <samp>B1</samp> and <samp>B2</samp> results
+for the three eigenstates.
+</p>
+<ol type="1" start="1" >
+<li>
+<p>
+<code>ho_eigenvalues_N500.dat</code>: system eigenvalues with values less than
+<samp>Max_aval_har</samp> in case <samp>Max_aval_har</samp> is not zero.
+</p>
+</li>
+</ol>
+<ol type="1" start="2" >
+<li>
+<p>
+<code>ho_pot_eigvec_N500.dat</code>: computed system eigenfunctions plus the
+energy as a function of <samp>x</samp>.
+</p>
+</li>
+</ol>
+<ol type="1" start="3" >
+<li>
+<p>
+<code>ho_pot_eigvec2_N500.dat</code>: squared modulus of the computed
+eigenfunctions plus the energy as a function of <samp>x</samp>.
+</p>
+</li>
+</ol>
+<ol type="1" start="4" >
+<li>
+<p>
+<code>ho_E1_N500_i.dat</code>, <samp>i = 1, 2, 3</samp>: Two columns, <samp>E_k
+|&lt;i|x|k;&gt;|^2</samp> for <samp>k = 1, ..., dim_C</samp>
+</p>
+</li>
+</ol>
+<ol type="1" start="5" >
+<li>
+<p>
+<code>ho_E1_TM_N500.dat</code>: Three columns, <samp>E_k &lt;1|x|k&gt;
+&lt;2|x|k&gt;| &lt;3|x|k&gt;</samp> for <samp>k = 1, ..., dim_C</samp>
+</p>
+</li>
+</ol>
+<ol type="1" start="6" >
+<li>
+<p>
+<code>ho_E2_N500_i.dat</code>, <samp>i = 1, 2, 3</samp>: Two columns, <samp>E_k
+|&lt;i|x^2|k&gt;|^2</samp> for <samp>k = 1, ..., dim_C</samp>
+</p>
+</li>
+</ol>
+<ol type="1" start="7" >
+<li>
+<p>
+<code>ho_E2_TM_N500.dat</code>: Three columns, <samp>E_k &lt;1|x^2|k&gt;
+&lt;2|x^2|k&gt;| &lt;3|x^2|k&gt;</samp> for <samp>k = 1, ..., dim_C</samp>
+</p>
+</li>
+</ol>
+
+<p>
+The value <samp>dim_C</samp> is equal to the truncated basis dimension
+<samp>Dim_HO</samp> if <samp>Max_aval_har</samp> is zero and to the number of
+eigenstates with eigenvalues less than <samp>Max_aval_har</samp> otherwise.
+</p>
+
+<hr>
+
+<p>
+[ <a href="ch-cap_1.html">previous</a> ]
+[ <a href="index.html#contents">Contents</a> ]
+[ <a href="ch-cap_0.html">1</a> ]
+[ <a href="ch-cap_1.html">2</a> ]
+[ 3 ]
+[ <a href="ch-cap_ref.html">4</a> ]
+[ <a href="ch-cap_ref.html">next</a> ]
+</p>
+
+<hr>
+
+<p>
+<code>tise_1D_pseudo</code> User's Guide
+</p>
+
+<address>
+Version 1<br>
+<br>
+Curro Perez-Bernal <code><a href="mailto:francisco.perez@dfaie.uhu.es">francisco.perez@dfaie.uhu.es</a></code><br>
+Laura Moschini <code><a href="mailto:laura.moschini@pd.infn.it">laura.moschini@pd.infn.it</a></code><br>
+<br>
+</address>
+<hr>
+
+</body>
+
+</html>
+
