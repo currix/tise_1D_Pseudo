@@ -1,10 +1,10 @@
 #
 #       INPUT FILE FOR INFSQ_1BODY_1D  hazitaylor potential
 #
-&INP_AUX   Igs = 0, I_sumr = 1, I_toten = 0, IsaveEN = 1, IsaveWF = 0, IsaveBAS = 0, Iprint = 2 /
+&INP_AUX   Igs = 0, IsaveEN = 1, IsaveWF = 0, IsaveBAS = 0, I_sumr = 0, I_toten = 0, B_analytical = .T., B_numerical = .F, Iprint = 3 /
 #
 &INP_X     X_min = -15.0, X_max = 15.0 /
-&INP_DIM   dim_X = 501, dim_BOX  = 20 /
+&INP_DIM   dim_X = 501, dim_BOX  = 20, max_aval_box = 0.0 /
 &INP_MASS  IAD = 1, REDUCED_MASS = 1.0 /
 &INP_POT   PARAM_POT = 1.0, 0.225, 0.0, 0.0, 0.0 /
 &INP_SHIFT Iphase = 0, LAMBDA = 0.225 /

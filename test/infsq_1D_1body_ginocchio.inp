@@ -1,9 +1,9 @@
 #
 #       INPUT FILE FOR Infsq_1BODY_1D ginocchio pot
 #
-&INP_AUX   I_GS = 0, I_SUMR = 0, I_toten = 0, ISAVE_EN = 1, ISAVE_WF = 1, ISAVE_BAS = 1, IPRINT = 3 /
+&INP_AUX   Igs = 0, IsaveEN = 1, IsaveWF = 0, IsaveBAS = 0, I_sumr = 0, I_toten = 0, B_analytical = .T., B_numerical = .F, Iprint = 3 /
 &INP_X     X_MIN = -20.0, X_MAX = 20.0 /
-&INP_DIM   DIM_X = 401, DIM_BOX = 80 /
+&INP_DIM   DIM_X = 401, DIM_BOX = 80, max_aval_box = 0.0 /
 &INP_MASS  IAD = 1, REDUCED_MASS = 1.0 /
 &INP_POT   PARAM_POT = 0.62, 1.0, 1.0, 0.0, 0.0  /
 &INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /

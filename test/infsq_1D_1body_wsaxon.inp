@@ -2,7 +2,7 @@
 #       INPUT FILE FOR INFSQ_1BODY_1D wsaxon
 #       
 #       
-&INP_AUX   Igs = 0, IsaveEN = 1, IsaveWF = 0, IsaveBAS = 0, I_sumr = 0, I_toten = 3, B_analytical = .T., B_numerical = .T, Iprint = 3 /
+&INP_AUX   Igs = 0, IsaveEN = 1, IsaveWF = 0, IsaveBAS = 0, I_sumr = 0, I_toten = 3, B_analytical = .T., B_numerical = .F, Iprint = 3 /
 #
 #
 &INP_X     X_min = -100.0, X_max = 100.0 /
