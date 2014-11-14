@@ -92,7 +92,7 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
         !
         ! File header
         WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_box(i)    B1_numerical**2"
+        WRITE(78,*) "#   E_i    k_i    B1_i_numerical**2"
         !
         DO i = 1, dim_BOX_diag
            !     
@@ -103,16 +103,18 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
            !
            CALL D01GAF(X_Grid, matrix_element, dim_X, B1_matrix(i, i_state), error, Ifail)
            !
-           WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <",i_state,"| X |Avec(",i,")> = ", B1_matrix(i, i_state)
+           IF (Iprint > 0) &
+                WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <",i_state,"| X |Avec(",i,")> = ", B1_matrix(i, i_state)
            !
            Total_B1(i_state) = Total_B1(i_state) + (B1_matrix(i, i_state)**2)
            !
            ! SAVING B1
-           WRITE(78,11)  Aval_box(i), B1_matrix(i, i_state)**2
+           WRITE(78,11)  Aval_box(i), (SIGN(Aval_box(i),Aval_box(i))/ABS(Aval_box(i)))* & ! To consider bound states
+                SQRT(2.0_DP*ABS(Aval_box(i))/h_sq_over_m), B1_matrix(i, i_state)**2
            !
         ENDDO
         !
-        WRITE(*,*) "Total B1: ", i_state, Total_B1(i_state)
+        IF (Iprint > 0) WRITE(*,*) "Total B1: ", i_state, Total_B1(i_state)
         !
      ENDIF
      !
@@ -123,7 +125,7 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
         !
         ! File header
         WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_box(i)    B1_analytical**2"
+        WRITE(78,*) "#   E_i    k_i    B1_i_analytical**2"
         !
         DO i = 1, DIM_BOX_diag
            !
@@ -134,13 +136,14 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
            B1_matrix(i, i_state) = B1_analytical
            !
            ! SAVING B1
-           WRITE(78,11)  Aval_box(i), B1_matrix(i, i_state)**2
+           WRITE(78,11)  Aval_box(i), (SIGN(Aval_box(i),Aval_box(i))/ABS(Aval_box(i)))* & ! To consider bound states
+                SQRT(2.0_DP*ABS(Aval_box(i))/h_sq_over_m), B1_matrix(i, i_state)**2
            !
            Total_B1(i_state) = Total_B1(i_state) + B1_matrix(i, i_state)**2
            !
         ENDDO
         !
-        WRITE(*,*) "Total B1: ", i_state, Total_B1(i_state)
+        IF (Iprint > 0) WRITE(*,*) "Total B1: ", i_state, Total_B1(i_state)
         !
      ENDIF
      !
@@ -173,7 +176,7 @@ SUBROUTINE B1_ISQW(Iprint, I_toten, B_numerical, B_analytical)
   CLOSE(UNIT = 76)
   !  
   !
-11 FORMAT (1X,E16.8,1X,E17.8)
+11 FORMAT (1X,E16.8,1X,E16.8,1X,E18.9)
 12 FORMAT (1X,E16.8,1X,10E17.8) !!!! Take care of the number of bound states I_toten
 15 FORMAT (2X,I3,A,E16.8,2X,A,I3,A,I3,A,E17.8)
   !

@@ -18,7 +18,7 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
   REAL(KIND = DP), DIMENSION(:), ALLOCATABLE :: matrix_element, Total_B2
   REAL(KIND = DP), DIMENSION(:,:), ALLOCATABLE ::  matrix_x2,  B2_matrix
   !
-  CHARACTER(LEN=65) :: filename_E2, filename_TM
+  CHARACTER(LEN=65) :: filename_B2, filename_TM
   CHARACTER(LEN=65) :: file = 'B2'
   CHARACTER(LEN=56) :: prog = 'isqw'
   !
@@ -106,15 +106,15 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
      !
      ! Define output filename
      IF ( dim_BOX < 10) THEN !to avoid spaces
-        WRITE(filename_E2, '(A, "_",A,"_N",I1,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
+        WRITE(filename_B2, '(A, "_",A,"_N",I1,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
      ELSE IF ( dim_BOX < 100) THEN 
-        WRITE(filename_E2, '(A, "_",A,"_N",I2,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
+        WRITE(filename_B2, '(A, "_",A,"_N",I2,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
      ELSE 
-        WRITE(filename_E2, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
+        WRITE(filename_B2, '(A, "_",A,"_N",I3,"_",I1,".dat")') TRIM(prog), TRIM(file), dim_BOX, i_state
      ENDIF
      !
      !
-     OPEN(UNIT = 78, FILE = filename_E2, STATUS = "UNKNOWN", ACTION = "WRITE")
+     OPEN(UNIT = 78, FILE = filename_B2, STATUS = "UNKNOWN", ACTION = "WRITE")
      !
      !
      IF (B_numerical) THEN
@@ -123,7 +123,7 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
         !
         ! File header
         WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_box(i)    B2_numerical**2"
+        WRITE(78,*) "#   E_i    k_i    B1_i_analytical**2"
         !
         DO i = 1, DIM_BOX_diag
            !     
@@ -140,11 +140,12 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
            Total_B2(i_state) = Total_B2(i_state) + (B2_matrix(i, i_state)**2)
            !
            ! SAVING B2
-           WRITE(78,11)  Aval_box(i), B2_matrix(i, i_state)**2
+           WRITE(78,11)  Aval_box(i), (SIGN(Aval_box(i),Aval_box(i))/ABS(Aval_box(i)))* & ! To consider bound states
+                SQRT(2.0_DP*ABS(Aval_box(i))/h_sq_over_m), B2_matrix(i, i_state)**2
            !
         ENDDO
         !
-        WRITE(*,*) "Total B2: ", i_state, Total_B2(i_state)
+        IF (Iprint > 0) WRITE(*,*) "Total B2: ", i_state, Total_B2(i_state)
         !
      ENDIF
      !
@@ -152,11 +153,11 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
      IF (B_analytical) THEN 
         !
         !
-        WRITE(*,*) "B2 :: Analytical method, state ", i_state
+        IF (Iprint > 0) WRITE(*,*) "B2 :: Analytical method, state ", i_state
         !
         ! File header
         WRITE(78,*) "# BOX  dim_BOX = ", dim_BOX, "dim_BOX_diag = ", dim_BOX_diag, " Box radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_box(i)    B2_analytical**2"
+        WRITE(78,*) "#   E_i    k_i    B1_i_analytical**2"
         !
         DO i = 1, DIM_BOX_diag
            !
@@ -168,14 +169,15 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
                 WRITE(*,15), i, "-th state energy: ", Aval_box(i), " <", i_state,"| X^2 |Avec(",i,")> = ",  B2_analytical
            !
            ! SAVING B2
-           WRITE(78,11)  Aval_box(i), B2_matrix(i, i_state)**2
+           WRITE(78,11)  Aval_box(i), (SIGN(Aval_box(i),Aval_box(i))/ABS(Aval_box(i)))* & ! To consider bound states
+                SQRT(2.0_DP*ABS(Aval_box(i))/h_sq_over_m), B2_matrix(i, i_state)**2
            !
            Total_B2(i_state) = Total_B2(i_state) + B2_matrix(i, i_state)**2
            !
         ENDDO
         !
         !
-        WRITE(*,*) "Total B2: ", i_state, Total_B2(i_state)
+        IF (Iprint > 0) WRITE(*,*) "Total B2: ", i_state, Total_B2(i_state)
         !
      ENDIF
      !
@@ -206,7 +208,7 @@ SUBROUTINE B2_ISQW(Iprint, I_toten, B_numerical, B_analytical)
   !
   CLOSE(UNIT = 76)
   !
-11 FORMAT (1X,E16.8,1X,E17.8)
+11 FORMAT (1X,E16.8,1X,E16.8,1X,E18.9)
 12 FORMAT (1X,E16.8,1X,10E17.8) !!!! Take care of the number of bound states I_toten
 15 FORMAT (2X,I3,A,E16.8,2X,A,I3,A,I3,A,E17.8)
   !

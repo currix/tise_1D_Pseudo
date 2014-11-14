@@ -93,10 +93,10 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
      !
      IF (B_numerical) THEN
         ! 
-        WRITE(*,*) "B2 :: Numerical method, state ", i_state
+        IF (Iprint > 0) WRITE(*,*) "B2 :: Numerical method, state ", i_state
         !
         WRITE(78,*) "#   dim_BOX = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_har(i)    B2_numerical**2"
+        WRITE(78,*) "# E_i    k_i    B2_i_numerical**2"
         !
         DO i = 1, dim_HO_diag
            !     
@@ -113,7 +113,8 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
            B2_matrix(i, i_state) =  B2_numerical
            !
            ! SAVING B2
-           WRITE(78,11)  Aval_Har(i), B2_numerical**2
+           WRITE(78,11)  Aval_Har(i), (SIGN(Aval_Har(i),Aval_Har(i))/ABS(Aval_Har(i)))* & ! To consider bound states
+                SQRT(2.0_DP*ABS(Aval_Har(i))/h_sq_over_m), B2_numerical**2
            !
            Total_B2(i_state) = Total_B2(i_state) + B2_numerical**2
            !
@@ -126,11 +127,11 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
      !
      IF (B_analytical) THEN 
         !
-        WRITE(*,*) "B2 :: Analytical method, state ", i_state
+        IF (Iprint > 0) WRITE(*,*) "B2 :: Analytical method, state ", i_state
         !
         !
         WRITE(78,*) "#   dim_BOX = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_har(i)    B2_analytical**2"
+        WRITE(78,*) "#   E_i    k_i    B1_i_analytical**2"
         !
         !
         DO i = 1, dim_HO_diag
@@ -141,13 +142,14 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
                 WRITE(*,15), i, "-th state energy: ", Aval_Har(i), " <", i_state, "| X^2 |Avec(",i,")> = ", B2_matrix(i, i_state)
            !
            ! SAVING B2
-           WRITE(78,11)  Aval_Har(i), B2_matrix(i, i_state)**2
+           WRITE(78,11)  Aval_Har(i), (SIGN(Aval_Har(i),Aval_Har(i))/ABS(Aval_Har(i)))* & ! To consider bound states
+                SQRT(2.0_DP*ABS(Aval_Har(i))/h_sq_over_m), B2_matrix(i, i_state)**2
            !
            Total_B2(i_state) = Total_B2(i_state) + (B2_matrix(i, i_state))**2
            !
         ENDDO
         !
-        PRINT*, "Total B2 = ", i_state, Total_B2(i_state)
+        IF (Iprint > 0) WRITE(*,*) "Total B2 = ", i_state, Total_B2(i_state)
         !
      ENDIF
      !
@@ -177,7 +179,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
   !
   CLOSE(UNIT = 76)
   !
-11 FORMAT (1X,E16.8,1X,E17.8)
+11 FORMAT (1X,E16.8,1X,E16.8,1X,E18.9)
 12 FORMAT (1X,E16.8,1X,10E17.8) !!!! Take care of the number of bound states I_toten
 15 FORMAT (2X,I3,A,E16.8,2X,A,I3,A,I3,A,E17.8)
   !
