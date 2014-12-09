@@ -95,7 +95,7 @@ SUBROUTINE B2_HO(Iprint, I_toten, apar, B_numerical, B_analytical)
         ! 
         IF (Iprint > 0) WRITE(*,*) "B2 :: Numerical method, state ", i_state
         !
-        WRITE(78,*) "#   dim_BOX = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
+        WRITE(78,*) "#   dim_HO = ", dim_HO, "dim_HO_diag = ", dim_HO_diag, " Integ. radius = ", X_max, " fm"
         WRITE(78,*) "# E_i    k_i    B2_i_numerical**2"
         !
         DO i = 1, dim_HO_diag
