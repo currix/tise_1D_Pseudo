@@ -219,15 +219,25 @@ SUBROUTINE THARDIAG(apt, Iprint, Iflag)
      STOP
   ENDIF
   !     DIAGONALIZATION USING LAPACK
-  IF (Iflag == 1) THEN
-     CALL LA_SYEVR(A=Ham_Mat, W=AVAL_THO, JOBZ='V', UPLO='L')
+  IF (max_aval_tho == 0.0) THEN
+     IF (Iflag == 1) THEN
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_THO, JOBZ='V', UPLO='L')
+     ELSE
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_THO, JOBZ='N', UPLO='L')
+        !
+        dim_tho_diag = dim_tho
+     ENDIF
   ELSE
-     CALL LA_SYEVR(A=Ham_Mat, W=AVAL_THO, JOBZ='N', UPLO='L')
+     IF (Iflag == 1) THEN
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_THO, JOBZ='V', VU = max_aval_tho, M = dim_THO_diag, UPLO='L')
+     ELSE
+        CALL LA_SYEVR(A=Ham_Mat, W=AVAL_THO, JOBZ='N', VU = max_aval_tho, M = dim_THO_diag, UPLO='L')
+     ENDIF
   ENDIF
   !
   IF (Iprint >= 1) THEN
-     PRINT*, "EIGENVALUES IN A ", dim_THO, " DIM HARMONIC BASIS"
-     DO I = 1, dim_THO
+     WRITE(*,*) dim_THO_diag, " EIGENVALUES COMPUTED IN A ", dim_THO, " DIM THO BASIS"
+     DO I = 1, dim_THO_diag
         WRITE(*,*) I, AVAL_THO(I)
      ENDDO
   ENDIF
@@ -242,7 +252,7 @@ SUBROUTINE THARDIAG(apt, Iprint, Iflag)
      AVEC_THO_X = 0.0_DP
      !
      DO KX = 1, dim_X
-        DO I = 1, dim_THO
+        DO I = 1, dim_THO_diag
            DO J = 1, dim_THO
               AVEC_THO_X(KX,I) = AVEC_THO_X(KX,I) + Ham_Mat(J,I)*THO_BAS(KX,J)*SQRT(der_S_x(KX))
            ENDDO

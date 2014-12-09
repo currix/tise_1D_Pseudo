@@ -21,23 +21,23 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
   CHARACTER(LEN=65) :: file = 'B1'
   CHARACTER(LEN=56) :: prog = 'tho'
   !
-  IF (Iprint > 1) PRINT*, "CALCULATING B1"
+  IF (Iprint > 1) WRITE(*,*) "CALCULATING B1"
   !
   ALLOCATE(matrix_element(1:dim_X), STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "matrix_element allocation request denied."
+     WRITE(*,*) "matrix_element allocation request denied."
      STOP
   ENDIF
   !
   ALLOCATE(matel(1:dim_X), STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "matel allocation request denied."
+     WRITE(*,*) "matel allocation request denied."
      STOP
   ENDIF
   !
   ALLOCATE(Total_B1(1:I_toten), STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "Total_B1  allocation request denied."
+     WRITE(*,*) "Total_B1  allocation request denied."
      STOP
   ENDIF
   !
@@ -46,7 +46,7 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
   !
   ALLOCATE(B1_matrix(1:dim_THO,1:I_toten), STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "B1_matrix  allocation request denied."
+     WRITE(*,*) "B1_matrix  allocation request denied."
      STOP
   ENDIF
   !
@@ -57,7 +57,7 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
      !
      ALLOCATE(matrix_X_THO_BASIS(1:dim_THO,1:dim_THO), STAT = Ierr)
      IF (Ierr /= 0) THEN
-        PRINT*, "matrix_X_THO_BASIS allocation request denied."
+        WRITE(*,*) "matrix_X_THO_BASIS allocation request denied."
         STOP
      ENDIF
      !
@@ -97,13 +97,13 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
      !
      IF (B_met1) THEN
         !
-        IF (Iprint > 1) PRINT*, "B1 ", i_state,"-th state :: Numerical method - 1"
+        IF (Iprint > 1) WRITE(*,*) "B1 ", i_state,"-th state :: Numerical method - 1"
         !
         ! File header
-        WRITE(78,*) "# THO  dim_THO = ", dim_THO, " Integ radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_THO(i)    B1_met1**2"
+        WRITE(78,*) "# THO  dim_THO = ", dim_THO, "dim_THO_diag = ", dim_THO_diag, " Integ radius = ", X_max, " fm"
+        WRITE(78,*) "# Aval_THO(i)    B1_met1**2"
         !
-        DO i = 1, dim_THO
+        DO i = 1, dim_THO_diag
            !
            matrix_element = 0.0_DP
            !     
@@ -126,20 +126,22 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
            !
          ENDDO
         !
-         PRINT*, "Total B1: ", i_state, Total_B1(i_state)
+         WRITE(*,*) "Total B1: ", i_state, Total_B1(i_state)
         !
      ENDIF
      !
      IF (B_met2) THEN
         !
-        IF (Iprint > 1) PRINT*, "B1 ", i_state,"-th state :: Numerical method - 2"
+        IF (Iprint > 1) WRITE(*,*) "B1 ", i_state,"-th state :: Numerical method - 2"
         !
         ! File header
-        WRITE(78,*) "# THO  dim_THO = ", dim_THO, " Integ radius = ", X_max, " fm"
-        WRITE(78,*) "#Aval_THO(i)    B1_met2**2"
+        WRITE(78,*) "# THO  dim_THO = ", dim_THO, "dim_THO_diag = ", dim_THO_diag, " Integ radius = ", X_max, " fm"
+        WRITE(78,*) "# Aval_THO(i)    B1_met2**2"
         !
-        DO i = 1, dim_THO
+        DO i = 1, dim_THO_diag
+           !
            B1_num2 = DOT_PRODUCT(Avec_THO(:,i_state),MATMUL(matrix_X_THO_BASIS, Avec_THO(:,i)))
+           !
            IF (Iprint > 1) WRITE(*,15), i, "-th state energy: ", Aval_THO(i), " <",I_state," | X |Avec(",i,")> = ", B1_num2
            !
            B1_matrix(i, i_state) =  B1_num2
@@ -151,7 +153,7 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
            !
         ENDDO
         !
-        PRINT*, "Total B1: ", i_state, Total_B1(i_state)
+        WRITE(*,*) "Total B1: ", i_state, Total_B1(i_state)
         !
      ENDIF
      !
@@ -171,10 +173,10 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
   !
   OPEN(UNIT = 76, FILE = filename_TM, STATUS = "UNKNOWN", ACTION = "WRITE")
   !
-  WRITE(76,*) "# THO  dim_THO = ", dim_THO, " Integ. radius = ", X_max, " fm"
-  WRITE(76,*) "#Aval_tho(i)    B1(i,1:n_states)"
+  WRITE(76,*) "# THO  dim_THO = ", dim_THO, "dim_THO_diag = ", dim_THO_diag, " Integ. radius = ", X_max, " fm"
+  WRITE(76,*) "# Aval_tho(i)    B1(i,1:n_states)"
   !
-  DO i = 1, dim_THO
+  DO i = 1, dim_THO_diag
      !
      ! SAVING B1
      WRITE(76,12)  Aval_THO(i), B1_matrix(i,1:I_toten)
@@ -191,25 +193,25 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
   !
   DEALLOCATE(matrix_element, STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "matrix_element deallocation request denied."
+     WRITE(*,*) "matrix_element deallocation request denied."
      STOP
   ENDIF
   !
   DEALLOCATE(matel, STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "matel deallocation request denied."
+     WRITE(*,*) "matel deallocation request denied."
      STOP
   ENDIF
   !
   DEALLOCATE(Total_B1, STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "Total_B1  deallocation request denied."
+     WRITE(*,*) "Total_B1  deallocation request denied."
      STOP
   ENDIF
   !
   DEALLOCATE(B1_matrix, STAT = Ierr)
   IF (Ierr /= 0) THEN
-     PRINT*, "B1_matrix deallocation request denied."
+     WRITE(*,*) "B1_matrix deallocation request denied."
      STOP
   ENDIF
   !
@@ -217,7 +219,7 @@ SUBROUTINE B1_THO(Iprint, I_toten, B_met1, B_met2)
   IF (B_met2) THEN
      DEALLOCATE(matrix_X_THO_BASIS, STAT = Ierr)
      IF (Ierr /= 0) THEN
-        PRINT*, "matrix_element deallocation request denied."
+        WRITE(*,*) "matrix_X_THO_BASIS deallocation request denied."
         STOP
      ENDIF
   ENDIF

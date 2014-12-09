@@ -229,7 +229,7 @@ PROGRAM THO_1BODY_1D
   !
   ! NAMELIST DEFINITIONS
   NAMELIST/INP_X/     X_min, X_max, ratio
-  NAMELIST/INP_DIM/   dim_X, dim_THO
+  NAMELIST/INP_DIM/   dim_X, dim_THO, last_bound_state, max_aval_tho
   NAMELIST/INP_MASS/  iad, reduced_mass
   NAMELIST/INP_POT/   Param_pot
   NAMELIST/INP_SHIFT/ I_phase, lambda
@@ -512,7 +512,7 @@ PROGRAM THO_1BODY_1D
   !     COMPUTING EIGENVECTOR DERIVATIVES
   !     EIGENSTATE DERIVATIVE
   DO J = 1, dim_X
-     DO I = 1, dim_THO
+     DO I = 1, dim_THO_diag
         CALL WFP(I, J, apar, dim_THO)
      ENDDO
   ENDDO
@@ -521,9 +521,9 @@ PROGRAM THO_1BODY_1D
   !
   IF (i_SUMR /= 0) THEN
      ! COMPUTE TOTAL SUM RULE STRENGTH
-     CALL Total_Strength(i_SUMR, dim_THO, dim_X, X_grid, Avec_THO_X, Iprint)
+     CALL Total_Strength(i_SUMR, dim_THO_diag, dim_X, X_grid, Avec_THO_X, Iprint)
      ! COMPUTE ENERGY WEIGHTED SUM RULE STRENGTH
-     CALL EW_STRENGTH(dim_THO, dim_X, X_grid, Aval_THO, Avec_THO_X, I_sumr)
+     CALL EW_STRENGTH(dim_THO_diag, dim_X, X_grid, Aval_THO, Avec_THO_X, I_sumr)
   ENDIF
   !
   ! CALCULATING B1 and B2
@@ -532,8 +532,8 @@ PROGRAM THO_1BODY_1D
      !CALCULATING B1
      CALL B1_THO(Iprint, I_toten, B_met1, B_met2)
      !
-     !CALCULATING E2
-     CALL E2_THO(Iprint, I_toten)
+     !CALCULATING B2
+     CALL B2_THO(Iprint, I_toten)
   ENDIF
   !
 
@@ -541,19 +541,27 @@ PROGRAM THO_1BODY_1D
   !
   ! PHASE SHIFT
   IF (I_phase == 1) THEN
-     IF (Iprint > 1) PRINT*, "PHASE SHIFT CALCULATION"
+     !
+     !
+     IF (Iprint > 1) WRITE(*,*) "PHASE SHIFT CALCULATION"
+     !
      file = 'phase_shift_ht'
+     !
      WRITE(filename, '(A, "_",A,"_N",I2, ".dat")') TRIM(prog), TRIM(file), dim_THO
+     !
      IF ( dim_THO < 10) THEN !to avoid spaces
         WRITE(filename, '(A, "_",A,"_N",I1, ".dat")') TRIM(prog), TRIM(file), dim_THO
      ENDIF
      IF ( dim_THO > 99) THEN 
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_THO
      ENDIF
+     !
      OPEN(UNIT = 76, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
+     !
      WRITE(76,*) "# THO  dim_THO = ", dim_THO, " Box radius = ", X_max, " fm"
      WRITE(76,*) "# Phase shift (Hazi and Taylor calculation)"
-     DO I = 1, dim_THO
+     !
+     DO I = 1, dim_THO_diag
         IF (Aval_THO(I) > 0.0_DP) THEN
            ee = Aval_THO(I)
            ek = SQRT((2.0D0*ee)/h_sq_over_m)
@@ -626,10 +634,10 @@ PROGRAM THO_1BODY_1D
         WRITE(filename, '(A, "_",A,"_N",I3, ".dat")') TRIM(prog), TRIM(file), dim_THO
      ENDIF
      OPEN(UNIT = 71, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
-     WRITE(71,*) "# THO  dim_THO = ", dim_THO, " Box radius = ", X_max, " fm"
+     WRITE(71,*) "# THO  dim_THO = ", dim_THO, "dim_THO_diag = ", dim_THO_diag, " Box radius = ", X_max, " fm"
      WRITE(71,*) "#Grid  Eigenvectors"
      DO kx = 1, dim_X
-        WRITE(71,11) X_grid(kx), Avec_THO_X(kx,1:dim_THO)
+        WRITE(71,11) X_grid(kx), Avec_THO_X(kx,1:dim_THO_diag)
      ENDDO
      CLOSE(UNIT = 71)
   ENDIF
@@ -666,8 +674,8 @@ PROGRAM THO_1BODY_1D
      ENDIF
      OPEN(UNIT = 73, FILE = filename, STATUS = "UNKNOWN", ACTION = "WRITE")
      WRITE(73,*) "# THO  dim_THO = ", dim_THO, " Box radius = ", X_max, " fm"
-     WRITE(73,*) "# Eigenvalues"
-     DO I = 1, dim_THO
+     WRITE(73,*) "# Eigenvalues  Max_aval_tho = ", Max_aval_tho
+     DO I = 1, dim_THO_diag
         WRITE(73,10) I, Aval_THO(I)
      ENDDO
      CLOSE(UNIT = 73)
@@ -696,8 +704,8 @@ PROGRAM THO_1BODY_1D
      WRITE(75,*) "# THO  dim_THO = ", dim_THO, " Box radius = ", X_max, " fm"
      WRITE(75,*) "#Grid    Potential    10*Eigenfunctions^2+eigenvalue"
      DO kx = 1, dim_X
-        WRITE(74,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_THO_X(kx,1:dim_THO) + Aval_THO(1:dim_THO)
-        WRITE(75,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_THO_X(kx,1:dim_THO)**2 + Aval_THO(1:dim_THO)
+        WRITE(74,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_THO_X(kx,1:dim_THO_diag) + Aval_THO(1:dim_THO_diag)
+        WRITE(75,11) X_grid(kx), Potf(X_grid(kx)), 10.0_DP*Avec_THO_X(kx,1:dim_THO)**2 + Aval_THO(1:dim_THO_diag)
      ENDDO
      CLOSE(UNIT = 74)
      CLOSE(UNIT = 75)
