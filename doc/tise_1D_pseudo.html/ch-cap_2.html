@@ -66,12 +66,12 @@ following structure (e.g.  <code>test/harm_osc_1D_1body_wsaxon.inp</code>
      #       INPUT FILE FO HO_1BODY_1D
      #
      &amp;INP_X     X_MIN = -140.0, X_MAX = 140.0 /
-     &amp;INP_DIM   Dim_X = 1501, Dim_HO = 500, last_bound_state = 3, Max_aval_har = 10.0 /
-     &amp;INP_MASS  IAD = 4, Reduced_mass = 0.975 /
+     &amp;INP_DIM   DIM_X = 1501, DIM_HO = 500, last_bound_state = 3, max_aval_har = 10.0 /
+     &amp;INP_MASS  IAD = 4, REDUCED_MASS = 0.975 /
      &amp;INP_POT   PARAM_POT = -50.0, 2.0, 0.4, 0.0, 0.0  /
-     &amp;INP_SHIFT I_PHASE = 0, Lambda = 0.1 /
+     &amp;INP_SHIFT I_PHASE = 0, LAMBDA = 0.1 /
      #
-     &amp;INP_AUX   I_gs = 0, Isave_EN = 1, Isave_WF = 0, Isave_BAS = 0, I_sumr = 0, I_toten = 3, B_analytical = .T., B_numerical = .T, Iprint = 3 /
+     &amp;INP_AUX   I_gs = 0, Isave_EN = 1, Isave_WF = 0, Isave_BAS = 0, I_sumr = 0, I_toten = 3, B_analytical = .T., B_numerical = .F, Iprint = 2 /
      #
      #
 </pre>
@@ -116,8 +116,8 @@ several bound states, state used to estimate the HO length scale.
 <p>
 <samp>Max_aval_har</samp>: <em>float</em> type.  If different from zero,
 calculate only system eigenstates with energies less than
-<samp>Max_aval_har</samp> (MeV units).  If <samp>Max_aval_har = 0.0</samp>
-calculate all eigenstates.
+<samp>Max_aval_har</samp> (MeV units).  If <samp>Max_aval_har = 0.0</samp> the
+program computes all the eigenstates.
 </p>
 </li>
 </ol>
@@ -298,167 +298,77 @@ An excerpt of the output is as follows
 
 <pre>
        X grid step =   0.18641810918774968      fm
-      kmin =    11.301296611404950       kmin - k10 =   -51.198703388595050       a =   0.71795315591406850       EGS =   -39.559250365551563     
-      MINIMUM:: kmin =    11.301296611404950       a =   0.71795315591406850       EGS =   -39.559250365551563     
-      HARMONIC BASIS CALCULATION with apar =   0.71795315591406850       DIMENSION          500
-      BUILDING HARMONIC BASIS
       HARMONIC FUNCTION            1  NORMALIZATION   1.0000000000000000     
       HARMONIC FUNCTION            2  NORMALIZATION   1.0000000000000002     
-      HARMONIC FUNCTION            3  NORMALIZATION   1.0000000000000000     
-      HARMONIC FUNCTION            4  NORMALIZATION   1.0000000000000004     
       .
       .
       .
-      HARMONIC FUNCTION          498  NORMALIZATION  0.99999999999999889     
-      HARMONIC FUNCTION          499  NORMALIZATION  0.99999999999999889     
       HARMONIC FUNCTION          500  NORMALIZATION  0.99999999999999922     
       HARMONIC FUNCTION          501  NORMALIZATION   1.0000000000000013     
-      DONE
-      BUILDING HAMILTONIAN MATRIX
                44  EIGENVALUES COMPUTED IN A          500  DIM HARMONIC BASIS
                 1  -39.575743429858143     
                 2  -17.870764051008919     
                 3 -0.51376864785484155     
                 4   2.2161186319837708E-002
                 5   2.5262705152647863E-002
+                6   8.8640984430509134E-002
                 .
                 .
                 .
                42   8.8266692344274524     
                43   9.2066002755550400     
                44   9.7283452731211177     
-      CALCULATING B1
-      B1 :: Numerical method, state            1
-         1-th state energy:  -0.39575743E+02   &lt;  1| X |Avec(  1)&gt; =   -0.14160336E-15
-         2-th state energy:  -0.17870764E+02   &lt;  1| X |Avec(  2)&gt; =   -0.98820380E+00
-         3-th state energy:  -0.51376865E+00   &lt;  1| X |Avec(  3)&gt; =    0.13902742E-16
-         4-th state energy:   0.22161186E-01   &lt;  1| X |Avec(  4)&gt; =   -0.98409246E-03
-         5-th state energy:   0.25262705E-01   &lt;  1| X |Avec(  5)&gt; =   -0.13041464E-13
-         .
-         .
-         .
-        42-th state energy:   0.88266692E+01   &lt;  1| X |Avec( 42)&gt; =    0.75484771E-02
-        43-th state energy:   0.92066003E+01   &lt;  1| X |Avec( 43)&gt; =    0.20201704E-14
-        44-th state energy:   0.97283453E+01   &lt;  1| X |Avec( 44)&gt; =    0.71621324E-02
-      Total B1:            1  0.97756688413360182     
       B1 :: Analytical method, state            1
          1-th state energy:  -0.39575743E+02   &lt;  1| X |Avec(  1)&gt; =    0.78354220E-16
          2-th state energy:  -0.17870764E+02   &lt;  1| X |Avec(  2)&gt; =   -0.98820380E+00
          3-th state energy:  -0.51376865E+00   &lt;  1| X |Avec(  3)&gt; =   -0.15379148E-15
-         4-th state energy:   0.22161186E-01   &lt;  1| X |Avec(  4)&gt; =   -0.98409246E-03
-         5-th state energy:   0.25262705E-01   &lt;  1| X |Avec(  5)&gt; =   -0.13047748E-13
          .
          .
          .
         42-th state energy:   0.88266692E+01   &lt;  1| X |Avec( 42)&gt; =    0.75484771E-02
         43-th state energy:   0.92066003E+01   &lt;  1| X |Avec( 43)&gt; =    0.20615985E-14
         44-th state energy:   0.97283453E+01   &lt;  1| X |Avec( 44)&gt; =    0.71621324E-02
-      Total B1:            1   1.9551337682672085     
-      B1 :: Numerical method, state            2
-         1-th state energy:  -0.39575743E+02   &lt;  2| X |Avec(  1)&gt; =   -0.98820380E+00
-         2-th state energy:  -0.17870764E+02   &lt;  2| X |Avec(  2)&gt; =   -0.30863643E-14
-         3-th state energy:  -0.51376865E+00   &lt;  2| X |Avec(  3)&gt; =    0.12096876E+01
-         4-th state energy:   0.22161186E-01   &lt;  2| X |Avec(  4)&gt; =   -0.75968651E-12
-         5-th state energy:   0.25262705E-01   &lt;  2| X |Avec(  5)&gt; =    0.65649404E-01
-         .
-         .
-         .
-        42-th state energy:   0.88266692E+01   &lt;  2| X |Avec( 42)&gt; =    0.90378367E-13
-        43-th state energy:   0.92066003E+01   &lt;  2| X |Avec( 43)&gt; =   -0.12875681E+00
-        44-th state energy:   0.97283453E+01   &lt;  2| X |Avec( 44)&gt; =   -0.55810040E-13
-      Total B1:            2   3.0885322344655424     
+      Total B1:            1  0.97756688413360637     
       B1 :: Analytical method, state            2
          1-th state energy:  -0.39575743E+02   &lt;  2| X |Avec(  1)&gt; =   -0.98820380E+00
          2-th state energy:  -0.17870764E+02   &lt;  2| X |Avec(  2)&gt; =   -0.23754587E-14
          3-th state energy:  -0.51376865E+00   &lt;  2| X |Avec(  3)&gt; =    0.12096876E+01
-         4-th state energy:   0.22161186E-01   &lt;  2| X |Avec(  4)&gt; =   -0.75967669E-12
-         5-th state energy:   0.25262705E-01   &lt;  2| X |Avec(  5)&gt; =    0.65649404E-01
          .
          .
          .
-        42-th state energy:   0.88266692E+01   &lt;  2| X |Avec( 42)&gt; =    0.90206680E-13
-        43-th state energy:   0.92066003E+01   &lt;  2| X |Avec( 43)&gt; =   -0.12875681E+00
-        44-th state energy:   0.97283453E+01   &lt;  2| X |Avec( 44)&gt; =   -0.55837081E-13
-      Total B1:            2   6.1770644689310874     
-      B1 :: Numerical method, state            3
-         1-th state energy:  -0.39575743E+02   &lt;  3| X |Avec(  1)&gt; =    0.13902742E-16
-         2-th state energy:  -0.17870764E+02   &lt;  3| X |Avec(  2)&gt; =    0.12096876E+01
-         3-th state energy:  -0.51376865E+00   &lt;  3| X |Avec(  3)&gt; =   -0.15634269E-12
-         4-th state energy:   0.22161186E-01   &lt;  3| X |Avec(  4)&gt; =   -0.14078074E+01
-         5-th state energy:   0.25262705E-01   &lt;  3| X |Avec(  5)&gt; =   -0.19173235E-10
-         .
-         .
-         .
-        42-th state energy:   0.88266692E+01   &lt;  3| X |Avec( 42)&gt; =    0.25086853E+00
-        43-th state energy:   0.92066003E+01   &lt;  3| X |Avec( 43)&gt; =   -0.20341090E-13
-        44-th state energy:   0.97283453E+01   &lt;  3| X |Avec( 44)&gt; =    0.22883743E+00
-      Total B1:            3   34.162824527021456     
-      B1 :: Analytical method, state            3
-         1-th state energy:  -0.39575743E+02   &lt;  3| X |Avec(  1)&gt; =   -0.15379148E-15
-         2-th state energy:  -0.17870764E+02   &lt;  3| X |Avec(  2)&gt; =    0.12096876E+01
-         3-th state energy:  -0.51376865E+00   &lt;  3| X |Avec(  3)&gt; =   -0.15730241E-12
-         4-th state energy:   0.22161186E-01   &lt;  3| X |Avec(  4)&gt; =   -0.14078074E+01
-         5-th state energy:   0.25262705E-01   &lt;  3| X |Avec(  5)&gt; =   -0.19172769E-10
-         .
-         .
-         .
-        42-th state energy:   0.88266692E+01   &lt;  3| X |Avec( 42)&gt; =    0.25086853E+00
         43-th state energy:   0.92066003E+01   &lt;  3| X |Avec( 43)&gt; =   -0.20346665E-13
         44-th state energy:   0.97283453E+01   &lt;  3| X |Avec( 44)&gt; =    0.22883743E+00
-      Total B1:            3   68.325649054042913     
-      CALCULATING B2
+      Total B1:            3   34.162824527021456     
       B2 :: Numerical method, state            1
-        1-th state energy:  -0.39575743E+02   &lt; bnd | X^2 |Avec(  1)&gt; =    0.97792289E+00
-        2-th state energy:  -0.17870764E+02   &lt; bnd | X^2 |Avec(  2)&gt; =    0.19534173E-14
-        3-th state energy:  -0.51376865E+00   &lt; bnd | X^2 |Avec(  3)&gt; =   -0.10810122E+01
-        4-th state energy:   0.22161186E-01   &lt; bnd | X^2 |Avec(  4)&gt; =    0.73594905E-12
-        5-th state energy:   0.25262705E-01   &lt; bnd | X^2 |Avec(  5)&gt; =   -0.60024484E-01
-        .
-        .
-        .
-       42-th state energy:   0.88266692E+01   &lt; bnd | X^2 |Avec( 42)&gt; =   -0.47565637E-14
-       43-th state energy:   0.92066003E+01   &lt; bnd | X^2 |Avec( 43)&gt; =    0.14978555E+00
-       44-th state energy:   0.97283453E+01   &lt; bnd | X^2 |Avec( 44)&gt; =   -0.88318993E-14
+         1-th state energy:  -0.39575743E+02   &lt;  1| X^2 |Avec(  1)&gt; =    0.97792289E+00
+         2-th state energy:  -0.17870764E+02   &lt;  1| X^2 |Avec(  2)&gt; =    0.19534173E-14
+         3-th state energy:  -0.51376865E+00   &lt;  1| X^2 |Avec(  3)&gt; =   -0.10810122E+01
+         .
+         .
+         .
+        43-th state energy:   0.92066003E+01   &lt;  1| X^2 |Avec( 43)&gt; =    0.14978555E+00
+        44-th state energy:   0.97283453E+01   &lt;  1| X^2 |Avec( 44)&gt; =   -0.88318993E-14
       Total B2:            1   2.7847318688712841     
-      B2 :: Analytical method, state            1
-        1-th state energy:  -0.39575743E+02   &lt;bnd | X^2 |Avec(  1)&gt; =    0.97792289E+00
-        2-th state energy:  -0.17870764E+02   &lt;bnd | X^2 |Avec(  2)&gt; =    0.11143904E-14
-        3-th state energy:  -0.51376865E+00   &lt;bnd | X^2 |Avec(  3)&gt; =   -0.10810122E+01
-        4-th state energy:   0.22161186E-01   &lt;bnd | X^2 |Avec(  4)&gt; =    0.73597443E-12
-        5-th state energy:   0.25262705E-01   &lt;bnd | X^2 |Avec(  5)&gt; =   -0.60024484E-01
-        .
-        .
-        .
-       42-th state energy:   0.88266692E+01   &lt;bnd | X^2 |Avec( 42)&gt; =   -0.46121711E-14
-       43-th state energy:   0.92066003E+01   &lt;bnd | X^2 |Avec( 43)&gt; =    0.14978555E+00
-       44-th state energy:   0.97283453E+01   &lt;bnd | X^2 |Avec( 44)&gt; =   -0.87897090E-14
-      Total B2 =            1   5.5694637377425691     
       B2 :: Numerical method, state            2
-        1-th state energy:  -0.39575743E+02   &lt; bnd | X^2 |Avec(  1)&gt; =    0.19534173E-14
-        2-th state energy:  -0.17870764E+02   &lt; bnd | X^2 |Avec(  2)&gt; =    0.31915150E+01
-        3-th state energy:  -0.51376865E+00   &lt; bnd | X^2 |Avec(  3)&gt; =    0.50963500E-13
-        4-th state energy:   0.22161186E-01   &lt; bnd | X^2 |Avec(  4)&gt; =   -0.74668969E-01
-        5-th state energy:   0.25262705E-01   &lt; bnd | X^2 |Avec(  5)&gt; =    0.23493682E-11
-        .
-        .
-        .
-       42-th state energy:   0.88266692E+01   &lt; bnd | X^2 |Avec( 42)&gt; =    0.31615217E-12
-       43-th state energy:   0.92066003E+01   &lt; bnd | X^2 |Avec( 43)&gt; =    0.86716506E+00
-       44-th state energy:   0.97283453E+01   &lt; bnd | X^2 |Avec( 44)&gt; =   -0.43781858E-13
-      Total B2:            3   4395.9771563158238     
-      B2 :: Analytical method, state            3
-        1-th state energy:  -0.39575743E+02   &lt;bnd | X^2 |Avec(  1)&gt; =   -0.10810122E+01
-        2-th state energy:  -0.17870764E+02   &lt;bnd | X^2 |Avec(  2)&gt; =    0.51724769E-13
-        3-th state energy:  -0.51376865E+00   &lt;bnd | X^2 |Avec(  3)&gt; =    0.34446553E+02
-        4-th state energy:   0.22161186E-01   &lt;bnd | X^2 |Avec(  4)&gt; =    0.24159193E-09
-        5-th state energy:   0.25262705E-01   &lt;bnd | X^2 |Avec(  5)&gt; =   -0.19760799E+02
-        .
-        .
-        .
-       42-th state energy:   0.88266692E+01   &lt;bnd | X^2 |Avec( 42)&gt; =    0.32220505E-12
-       43-th state energy:   0.92066003E+01   &lt;bnd | X^2 |Avec( 43)&gt; =    0.86716506E+00
-       44-th state energy:   0.97283453E+01   &lt;bnd | X^2 |Avec( 44)&gt; =   -0.37139116E-13
-      Total B2 =            3   8791.9543126316366
+         1-th state energy:  -0.39575743E+02   &lt;  2| X^2 |Avec(  1)&gt; =    0.19534173E-14
+         2-th state energy:  -0.17870764E+02   &lt;  2| X^2 |Avec(  2)&gt; =    0.31915150E+01
+         3-th state energy:  -0.51376865E+00   &lt;  2| X^2 |Avec(  3)&gt; =    0.50963500E-13
+         .
+         .
+         .
+        43-th state energy:   0.92066003E+01   &lt;  2| X^2 |Avec( 43)&gt; =    0.63722266E-11
+        44-th state energy:   0.97283453E+01   &lt;  2| X^2 |Avec( 44)&gt; =    0.60894549E+00
+      Total B2:            2   16.285900094324546     
+      B2 :: Numerical method, state            3
+         1-th state energy:  -0.39575743E+02   &lt;  3| X^2 |Avec(  1)&gt; =   -0.10810122E+01
+         2-th state energy:  -0.17870764E+02   &lt;  3| X^2 |Avec(  2)&gt; =    0.50963500E-13
+         3-th state energy:  -0.51376865E+00   &lt;  3| X^2 |Avec(  3)&gt; =    0.34446553E+02
+         .
+         .
+         .
+        43-th state energy:   0.92066003E+01   &lt;  3| X^2 |Avec( 43)&gt; =    0.86716506E+00
+        44-th state energy:   0.97283453E+01   &lt;  3| X^2 |Avec( 44)&gt; =   -0.43781858E-13
+      Total B2:            3   4395.9771563158238
 </pre>
 
 <p>
@@ -484,7 +394,7 @@ properties (calle <samp>Analytical method</samp>).  Both should coincide.
 </p>
 
 <p>
-The following files are saved, note that the <samp>N250</samp> part of the name
+The following files are saved, note that the <samp>N500</samp> part of the name
 varies with the <samp>N</samp> value and that in this case there are three
 bound states and we are asking for <samp>B1</samp> and <samp>B2</samp> results
 for the three eigenstates.
